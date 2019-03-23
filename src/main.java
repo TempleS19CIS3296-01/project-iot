@@ -78,17 +78,17 @@ public class main {
        System.out.println("Welcome to Owl Scan. Would you like to scan your entire network (1) or a certain " +
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
-
+       String subnet = "192.168.1";
        switch(choice) {
            case 1:
-               String[] IPMax = populateIPRange("10.110.58", 1, 256);  //edit subnet here
+               String[] IPMax = populateIPRange(subnet, 1, 256);  //edit subnet here
                scanIPRange(IPMax, 256);
                break;
 
            case 2:
                System.out.println("Enter your max range: ");
                int maxRange = scan.nextInt();
-               String[] IPRange = populateIPRange("10.110.58", 1, maxRange); //edit subnet here
+               String[] IPRange = populateIPRange(subnet, 1, maxRange); //edit subnet here
                scanIPRange(IPRange, maxRange);
                break;
 
