@@ -5,9 +5,13 @@ Our team comes from a variety of backgrounds. We have two members who are famili
 
 Key Educational Concepts this project will stress include (but are not limited to):
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object-Oriented Design
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test-Driven-Development
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Design Patterns
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Debugging
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Code Optimization
 		
 Goals and Milestones
