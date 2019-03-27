@@ -1,13 +1,15 @@
 # IoT-Security
 
-Project Relevance
+**Project Relevance**
 Our team comes from a variety of backgrounds. We have two members who are familiar with IoT/networking through some formal means (coursework, research, internship/job experience), one member who has an engineering background (which taught him specifically about MAC layer functionalities), and our final member has a background in math, specializing in machine learning. Even though half our team is familiar with the internet of things, we all have a lot to learn and are planning to do so with this project. For instance, we foresee the biggest challenge in this project to be figuring out how to target and access all connected devices on a network. This comes with multiple challenges, as resource discovery in IoT is non-trivial and there is no one protocol for auditing IoT devices (each company has their own ideas, etc). We believe learning how to accomplish those tasks will be critical not only for this project, but for our careers in computer science; as the number of connected devices increases rapidly, knowing how to work and interact with IoT devices will become quintessential for all computer scientists. 
-	Key Educational Concepts this project will stress include (but are not limited to):
-		Object-Oriented Design
-		Test-Driven-Development
-		Design Patterns
-		Debugging
-		Code Optimization
+
+Key Educational Concepts this project will stress include (but are not limited to):
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object-Oriented Design
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test-Driven-Development
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Design Patterns
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Debugging
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Code Optimization
+		
 Goals and Milestones
 	Our long-term goal with this project is to create a tool that can target all connected devices on a network and perform an audit to search for vulnerabilities on those devices.	
 Some milestones we plan to achieve throughout the course of this project are:
