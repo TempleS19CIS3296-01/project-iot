@@ -3,7 +3,7 @@
 **Project Relevance**
 Our team comes from a variety of backgrounds. We have two members who are familiar with IoT/networking through some formal means (coursework, research, internship/job experience), one member who has an engineering background (which taught him specifically about MAC layer functionalities), and our final member has a background in math, specializing in machine learning. Even though half our team is familiar with the internet of things, we all have a lot to learn and are planning to do so with this project. For instance, we foresee the biggest challenge in this project to be figuring out how to target and access all connected devices on a network. This comes with multiple challenges, as resource discovery in IoT is non-trivial and there is no one protocol for auditing IoT devices (each company has their own ideas, etc). We believe learning how to accomplish those tasks will be critical not only for this project, but for our careers in computer science; as the number of connected devices increases rapidly, knowing how to work and interact with IoT devices will become quintessential for all computer scientists. 
 
-[](chart.png)
+[image1](chart.png)
 
 **Key Educational Concepts** this project will stress include (but are not limited to):
 
