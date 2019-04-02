@@ -82,7 +82,7 @@ public class main {
                InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
                System.out.println("Current IP address is : " + localHost.getHostAddress());
                String subnetString = localHost.getHostAddress(); //get the local ip as a string
-               String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet (assumes local ip will end in .1)
+               String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
                System.out.println("Current IP subnet to scan is : " + subnet);
                //subnet = "192.168.1";
                String[] IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
