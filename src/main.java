@@ -7,33 +7,15 @@ help for updating if devices need to be. All will be printed in audit.
 
 import java.net.InetAddress;
 import java.io.*;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class main {
 
     static int devicesFound = 0;
+    static final int NUM_WORKERS = 4;// How many threads we have going.
 
-    /**
-     * Sends pings to an IP address and checks if host is reachable
-     * @param ipAddress - String to be pinged
-     */
-    public static void sendPingRequest(String ipAddress)
-            throws IOException
-    {
-        String deviceName;
-        InetAddress IP = InetAddress.getByName(ipAddress);
 
-        if (IP.isReachable(5000)) {
-            //deviceName = IP.getCanonicalHostName().substring( 0, IP.getCanonicalHostName().indexOf("."));
-            //System.out.println("\nHost is reachable with IP Address: " + ipAddress + "\nHost name: " +
-              //      IP.getCanonicalHostName() + "\nDevice name: " + deviceName);
-            System.out.println("\nHost is reachable with IP Address: " + ipAddress + "\nHost name: " +
-                    IP.getCanonicalHostName());
-            devicesFound++;
-        }
-        else
-            System.out.println("PING FAILED");
-    }
 
     /**
      * Populates an array of IP addresses
@@ -42,41 +24,36 @@ public class main {
      * @param max - ending IP address ex)256, 20
      * @return IPs - string of IP addresses
      */
-    public static String[] populateIPRange(String ip, int min, int max){
-        String[] IPs = new String[max];
-        int i = 0;
-        while(i < max){
+    public static String[][] populateIPRange(String ip, int min, int max, int size){
+        String[][] IPs = new String[size][max/size];
+        int index1 = 0;
+        int index2 = 0;
+        while(index1 < size){
             String s = ip + "." + min;
-            IPs[i] = s;
-            //System.out.println("IP Address: " + IPs[i]);
+            IPs[index1][index2] = s;
             min++;
-            i++;
+            index2++;
+            if (index2 >= max/size){
+                index1++;
+                index2 = 0;
+            }
         }
         return IPs;
     }
 
-    /**
-     * Scans a range of IP addresses and sees if each can be pinged
-     * @param IP - a String[] of IP addresses to ping
-     * @param max - ending IP address ex)256, 20
-     */
-    public static void scanIPRange(String[] IP, int max) throws IOException{
-        int i = 0;
-        while (i < max){
-            sendPingRequest(IP[i]);
-            i++;
-        }
-        System.out.println("\n-------------------------------------------\n" +
-                "Scan completed with " + devicesFound + " devices found. " +
-                "\n-------------------------------------------");
-    }
+
 
     // Driver code
     public static void main(String[] args) throws IOException {
        Scanner scan = new Scanner(System.in);
-       System.out.println("Welcome to Owl Scan. Would you like to run a quick scan (1) or would you like to scan a certain " +
+       System.out.println("Welcome to SHIT Scanner. Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
+
+       Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
+       Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
+       String[][] IPMax;// 2d array so that each thread can get its own IPrange.
+       LinkedList hits = new LinkedList();// Keep a linked list for storing all ip addresses we find.
        switch(choice) {
            case 1:
                InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
@@ -84,21 +61,44 @@ public class main {
                String subnetString = localHost.getHostAddress(); //get the local ip as a string
                String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
                System.out.println("Current IP subnet to scan is : " + subnet);
-               String[] IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
-               scanIPRange(IPMax, 256);
+               IPMax = populateIPRange(subnet, 1, 255, NUM_WORKERS);  //edit subnet here
+               // EVERYONE GET READY TO START YOUR ENGINES.
+               for (int i = 0; i < NUM_WORKERS; i++){
+                   pool[i] = new Scan(hits, IPMax[i]);
+                   threads[i] = new Thread(pool[i], "Worker " + i);
+                   threads[i].start();// Start all threads.
+               }
                break;
            case 2:
                System.out.println("Enter your desired subnet to scan: ");
                String sub = scan.next();
                System.out.println("Enter your max range: ");
                int maxRange = scan.nextInt();
-               String[] IPRange = populateIPRange(sub, 1, maxRange); //edit subnet here
-               scanIPRange(IPRange, maxRange);
+               IPMax = populateIPRange(sub, 1, maxRange, NUM_WORKERS);
+               // I don't want these engines to start.
+               for (int i = 0; i < NUM_WORKERS; i++){
+                   pool[i] = new Scan(hits, IPMax[i]);
+                   threads[i] = new Thread(pool[i], "Worker " + i);
+                   threads[i].start();// But they do.
+               }
                break;
 
            default:
                System.out.println("Error: value entered was not in range.");
                System.exit(0);
        }
+
+       for (int i = 0; i < NUM_WORKERS; i++){
+           try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
+               threads[i].join();
+           } catch (InterruptedException e){
+               System.out.println("Interrupted during join");
+           }
+       }
+        for (int i = 0; i < NUM_WORKERS; i++){
+            System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
+        }
+       System.out.println("We found " + hits.size() + " devices.");
+
     }
 }
