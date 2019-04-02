@@ -79,11 +79,11 @@ public class main {
        int choice = scan.nextInt();
        switch(choice) {
            case 1:
-                InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
-                System.out.println("Current IP address is : " + localHost.getHostAddress());
-                String subnetString = localHost.getHostAddress(); //get the local ip as a string
-                String subnet = subnetString.substring(0, subnetString.length()-2);//get the subnet (assumes local ip will end in .1)
-                System.out.println("Current IP subnet to scan is : " + subnet);
+               InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
+               System.out.println("Current IP address is : " + localHost.getHostAddress());
+               String subnetString = localHost.getHostAddress(); //get the local ip as a string
+               String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
+               System.out.println("Current IP subnet to scan is : " + subnet);
                String[] IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
                scanIPRange(IPMax, 256);
                break;
