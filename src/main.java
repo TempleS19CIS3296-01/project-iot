@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.time.Clock;
 
 public class main {
 
@@ -54,6 +55,8 @@ public class main {
        Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
        String[][] IPMax;// 2d array so that each thread can get its own IPrange.
        LinkedList hits = new LinkedList();// Keep a linked list for storing all ip addresses we find.
+       Clock clock = Clock.systemDefaultZone();
+       long start = clock.millis();
        switch(choice) {
            case 1:
                InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
@@ -98,7 +101,8 @@ public class main {
         for (int i = 0; i < NUM_WORKERS; i++){
             System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
         }
-       System.out.println("We found " + hits.size() + " devices.");
+       long end = clock.millis();
+       System.out.println("We found " + hits.size() + " devices in " + (end - start) / 1000 + " seconds.");
 
     }
 }

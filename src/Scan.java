@@ -34,7 +34,7 @@ public class Scan implements Runnable{
             }
         }
         else
-            System.out.println("PING FAILED");
+            System.out.println("PING FAILED: " + ipAddress);
     }
 
     /**
