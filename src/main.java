@@ -84,7 +84,6 @@ public class main {
                String subnetString = localHost.getHostAddress(); //get the local ip as a string
                String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
                System.out.println("Current IP subnet to scan is : " + subnet);
-               //subnet = "192.168.1";
                String[] IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
                scanIPRange(IPMax, 256);
                break;
