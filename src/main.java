@@ -9,7 +9,6 @@ import java.net.InetAddress;
 import java.io.*;
 import java.util.Scanner;
 
-
 public class main {
 
     static int devicesFound = 0;
@@ -75,20 +74,25 @@ public class main {
     // Driver code
     public static void main(String[] args) throws IOException {
        Scanner scan = new Scanner(System.in);
-       System.out.println("Welcome to Owl Scan. Would you like to scan your entire network (1) or a certain " +
+       System.out.println("Welcome to Owl Scan. Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
-       String subnet = "192.168.1";
        switch(choice) {
            case 1:
-               String[] IPMax = populateIPRange(subnet, 1, 256);  //edit subnet here
+               InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
+               System.out.println("Current IP address is : " + localHost.getHostAddress());
+               String subnetString = localHost.getHostAddress(); //get the local ip as a string
+               String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
+               System.out.println("Current IP subnet to scan is : " + subnet);
+               String[] IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
                scanIPRange(IPMax, 256);
                break;
-
            case 2:
+               System.out.println("Enter your desired subnet to scan: ");
+               String sub = scan.next();
                System.out.println("Enter your max range: ");
                int maxRange = scan.nextInt();
-               String[] IPRange = populateIPRange(subnet, 1, maxRange); //edit subnet here
+               String[] IPRange = populateIPRange(sub, 1, maxRange); //edit subnet here
                scanIPRange(IPRange, maxRange);
                break;
 
