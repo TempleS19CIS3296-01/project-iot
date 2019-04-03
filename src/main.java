@@ -14,7 +14,7 @@ import java.time.Clock;
 public class main {
 
     static int devicesFound = 0;
-    static final int NUM_WORKERS = 4;// How many threads we have going.
+    static final int NUM_WORKERS = 255;// How many threads we have going.
 
 
 
@@ -25,18 +25,27 @@ public class main {
      * @param max - ending IP address ex)256, 20
      * @return IPs - string of IP addresses
      */
-    public static String[][] populateIPRange(String ip, int min, int max, int size){
-        String[][] IPs = new String[size][max/size];
+    public static String[][] populateIPRange(String ip, int min, int max){
+        // The ceiling of the quotient makes sure we don't miss any IP addresses.
+        // Any additional array elements created by this will be set to null, and
+        // our sendIPRequest function handles null strings.
+        String[][] IPs = new String[NUM_WORKERS][(int)Math.ceil(1.0*max/NUM_WORKERS)];
         int index1 = 0;
         int index2 = 0;
-        while(index1 < size){
-            String s = ip + "." + min;
+        String s;
+        while(index2 < Math.ceil(1.0*max/NUM_WORKERS)){
+            // If we have already populated 255 ip addresses, then add null.
+            if (index2 * NUM_WORKERS + index1 >= max){
+                s = null;
+            } else {
+                s = ip + "." + min;
+            }
             IPs[index1][index2] = s;
             min++;
-            index2++;
-            if (index2 >= max/size){
-                index1++;
-                index2 = 0;
+            index1++;
+            if (index1 >= NUM_WORKERS){
+                index1 = 0;
+                index2++;
             }
         }
         return IPs;
@@ -64,7 +73,7 @@ public class main {
                String subnetString = localHost.getHostAddress(); //get the local ip as a string
                String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
                System.out.println("Current IP subnet to scan is : " + subnet);
-               IPMax = populateIPRange(subnet, 1, 255, NUM_WORKERS);  //edit subnet here
+               IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
                // EVERYONE GET READY TO START YOUR ENGINES.
                for (int i = 0; i < NUM_WORKERS; i++){
                    pool[i] = new Scan(hits, IPMax[i]);
@@ -77,7 +86,7 @@ public class main {
                String sub = scan.next();
                System.out.println("Enter your max range: ");
                int maxRange = scan.nextInt();
-               IPMax = populateIPRange(sub, 1, maxRange, NUM_WORKERS);
+               IPMax = populateIPRange(sub, 1, maxRange);
                // I don't want these engines to start.
                for (int i = 0; i < NUM_WORKERS; i++){
                    pool[i] = new Scan(hits, IPMax[i]);
