@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 public class Scan implements Runnable{
@@ -19,22 +20,30 @@ public class Scan implements Runnable{
      * Sends pings to an IP address and checks if host is reachable
      * @param ipAddress - String to be pinged
      */
-    public void sendPingRequest(String ipAddress)
-            throws IOException
-    {
+    public void sendPingRequest(String ipAddress){
         String deviceName;
-        InetAddress IP = InetAddress.getByName(ipAddress);
-
-        if (IP.isReachable(5000)) {
-            System.out.println("\nHost is reachable with IP Address: " + ipAddress + "\nHost name: " +
-                    IP.getCanonicalHostName());
-            devicesFound++;
-            synchronized (hits){
-                hits.push(ipAddress);
+        InetAddress IP = null;
+        try {
+            IP = InetAddress.getByName(ipAddress);
+            try {
+                if (IP.isReachable(5000)) {
+                    System.out.println("\nHost is reachable with IP Address: " + ipAddress + "\nHost name: " +
+                            IP.getCanonicalHostName());
+                    devicesFound++;
+                    synchronized (hits) {
+                        hits.push(ipAddress);
+                    }
+                } else
+                    System.out.println("PING FAILED: " + ipAddress);
+            } catch (IOException e){
+                System.out.println("IOException");
+                e.printStackTrace();
             }
+        } catch (UnknownHostException e){
+            System.out.println("Unknown Host");
+            e.printStackTrace();
         }
-        else
-            System.out.println("PING FAILED: " + ipAddress);
+
     }
 
     /**
@@ -44,6 +53,9 @@ public class Scan implements Runnable{
      */
     public void scanIPRange(String[] IP, int max) throws IOException{
         for (int i = 0; i < IP.length; i++){
+            if (IP[i] == null){// Once we get to a null string, the remaining strings in the array will be null (this should be the last element anyways.
+                break;
+            }
             sendPingRequest(IP[i]);
         }
     }
