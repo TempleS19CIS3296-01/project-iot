@@ -7,14 +7,13 @@ help for updating if devices need to be. All will be printed in audit.
 
 import java.net.InetAddress;
 import java.io.*;
-import java.util.LinkedList;
 import java.util.Scanner;
 import java.time.Clock;
 
 public class main {
 
     static int devicesFound = 0;
-    static final int NUM_WORKERS = 255;// How many threads we have going.
+    static final int NUM_WORKERS = 4;// How many threads we have going.
 
 
 
@@ -53,8 +52,32 @@ public class main {
 
 
 
+    /*
+     * This is the simplified way to execute and parse Nmap output.  This is the
+     * easiest way to run Nmap from this API.  Use of this class requires a little
+     * more knowledge of Nmap's flags in order to work.
+     * <p>
+     * Here is an example of how to use this class:
+     * <code>
+     * Nmap4j nmap4j = new Nmap4j( "/usr/local" ) ;
+     * nmap4j.includeHosts( "192.168.1.1-255" ) ;
+     * nmap4j.excludeHosts( "192.168.1.110" ) ;
+     * nmap4j.addFlags( "-T3 -oX - -O -sV" ) ;
+     * nmap4j.execute() ;
+     * if( !nma4j.hasError() ) {
+     * NMapRun nmapRun = nmap4j.getResults() ;
+     * } else {
+     * System.out.println( nmap4j.getExecutionResults().getErrors() ) ;
+     * }
+     * </code>
+     * <p>
+     * This block would need a try/catch because the execute() method throws two
+     * different exceptions.
+     *
+     */
     // Driver code
     public static void main(String[] args) throws IOException {
+
        Scanner scan = new Scanner(System.in);
        System.out.println("Welcome to SHIT Scanner. Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
@@ -63,8 +86,9 @@ public class main {
        Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
        Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
        String[][] IPMax;// 2d array so that each thread can get its own IPrange.
-       LinkedList hits = new LinkedList();// Keep a linked list for storing all ip addresses we find.
+       LinkedList2 hits = new LinkedList2();// Keep a linked list for storing all ip addresses we find.
        Clock clock = Clock.systemDefaultZone();
+       System.out.println("Starting Scan...");
        long start = clock.millis();
        switch(choice) {
            case 1:
@@ -77,7 +101,7 @@ public class main {
                // EVERYONE GET READY TO START YOUR ENGINES.
                for (int i = 0; i < NUM_WORKERS; i++){
                    pool[i] = new Scan(hits, IPMax[i]);
-                   threads[i] = new Thread(pool[i], "Worker " + i);
+                   threads[i] = new Thread(pool[i], "Scanner " + i);
                    threads[i].start();// Start all threads.
                }
                break;
@@ -111,7 +135,29 @@ public class main {
             System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
         }
        long end = clock.millis();
-       System.out.println("We found " + hits.size() + " devices in " + (end - start) / 1000 + " seconds.");
+       System.out.println("We found " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
 
+       Audit[] auditPool = new Audit[hits.length()];
+       threads = new Thread[hits.length()];
+       LinkedList2.Node tmp = hits.head.next;
+       int i = 0;
+       System.out.println("Starting nmap of all found devices...");
+       start = clock.millis();
+       while (tmp != null){
+           auditPool[i] = new Audit(tmp.val);
+           threads[i] = new Thread(auditPool[i], "Auditor " + i);
+           threads[i].start();
+           i++;
+           tmp = tmp.next;
+       }
+        for (i = 0; i < auditPool.length; i++){
+            try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
+                threads[i].join();
+            } catch (InterruptedException e){
+                System.out.println("Interrupted during join");
+            }
+        }
+        end = clock.millis();
+        System.out.println("We audited " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
     }
 }
