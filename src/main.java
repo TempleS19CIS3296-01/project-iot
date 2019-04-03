@@ -14,7 +14,7 @@ import java.time.Clock;
 public class main {
 
     static int devicesFound = 0;
-    static final int NUM_WORKERS = 4;// How many threads we have going.
+    static final int NUM_WORKERS = 100;// How many threads we have going.
 
 
 
@@ -103,6 +103,5 @@ public class main {
         }
        long end = clock.millis();
        System.out.println("We found " + hits.size() + " devices in " + (end - start) / 1000 + " seconds.");
-
     }
 }
