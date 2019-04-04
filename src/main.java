@@ -112,6 +112,5 @@ public class main {
         }
        long end = clock.millis();
        System.out.println("We found " + hits.size() + " devices in " + (end - start) / 1000 + " seconds.");
-
     }
 }
