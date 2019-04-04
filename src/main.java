@@ -108,6 +108,9 @@ public class main {
            }
        }
         for (int i = 0; i < NUM_WORKERS; i++){
+            if(pool[i].getDevicesFound() == 0) {
+                continue;//don't print threads that returned no devices.
+            }
             System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
         }
        long end = clock.millis();
