@@ -17,6 +17,7 @@ public class Audit implements Runnable{
     @Override
     public void run() {
         nmap4j.includeHosts(ip);
+        nmap4j.addFlags("-Pn");
         try {
             nmap4j.execute();
             if (!nmap4j.hasError()) {
