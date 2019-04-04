@@ -56,7 +56,8 @@ public class main {
     // Driver code
     public static void main(String[] args) throws IOException {
        Scanner scan = new Scanner(System.in);
-       System.out.println("Welcome to SHIT Scanner. Would you like to run a quick scan (1) or would you like to scan a certain " +
+       printOpening();
+       System.out.println("Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
 
@@ -115,5 +116,18 @@ public class main {
         }
        long end = clock.millis();
        System.out.println("We found " + hits.size() + " devices in " + (end - start) / 1000 + " seconds.");
+    }
+
+    public static void printOpening(){
+        System.out.println();
+        System.out.println(" $$$$$$\\  $$\\   $$\\ $$$$$$\\ $$$$$$$$\\          $$$$$$\\   $$$$$$\\   $$$$$$\\  $$\\   $$\\ $$\\   $$\\ $$$$$$$$\\ $$$$$$$\\");
+        System.out.println("$$  __$$\\ $$ |  $$ |\\_$$  _|\\__$$  __|        $$  __$$\\ $$  __$$\\ $$  __$$\\ $$$\\  $$ |$$$\\  $$ |$$  _____|$$  __$$\\");
+        System.out.println("$$ /  \\__|$$ |  $$ |  $$ |     $$ |           $$ /  \\__|$$ /  \\__|$$ /  $$ |$$$$\\ $$ |$$$$\\ $$ |$$ |      $$ |  $$ |");
+        System.out.println("\\$$$$$$\\  $$$$$$$$ |  $$ |     $$ |           \\$$$$$$\\  $$ |      $$$$$$$$ |$$ $$\\$$ |$$ $$\\$$ |$$$$$\\    $$$$$$$  |");
+        System.out.println(" \\____$$\\ $$  __$$ |  $$ |     $$ |            \\____$$\\ $$ |      $$  __$$ |$$ \\$$$$ |$$ \\$$$$ |$$  __|   $$  __$$<");
+        System.out.println("$$\\   $$ |$$ |  $$ |  $$ |     $$ |           $$\\   $$ |$$ |  $$\\ $$ |  $$ |$$ |\\$$$ |$$ |\\$$$ |$$ |      $$ |  $$ |");
+        System.out.println("\\$$$$$$  |$$ |  $$ |$$$$$$\\    $$ |           \\$$$$$$  |\\$$$$$$  |$$ |  $$ |$$ | \\$$ |$$ | \\$$ |$$$$$$$$\\ $$ |  $$ |");
+        System.out.println(" \\______/ \\__|  \\__|\\______|   \\__|            \\______/  \\______/ \\__|  \\__|\\__|  \\__|\\__|  \\__|\\________|\\__|  \\__|");
+        System.out.println();
     }
 }
