@@ -13,7 +13,7 @@ import java.time.Clock;
 public class main {
 
     static int devicesFound = 0;
-    static final int NUM_WORKERS = 4;// How many threads we have going.
+    static final int NUM_WORKERS = 255;// How many threads we have going.
 
 
 

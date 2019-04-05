@@ -54,7 +54,9 @@ public class Audit implements Runnable{
                 e.printStackTrace();
                 return;
             }
-            //System.out.println(nmap4j.getOutput());
+            Element root = doc.getDocumentElement();
+            System.out.println(root.getAttribute("ports"));
+            System.out.println(nmap4j.getOutput());
         } else {
             System.out.println(nmap4j.getExecutionResults().getErrors());
         }
