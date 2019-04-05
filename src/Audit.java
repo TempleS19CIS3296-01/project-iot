@@ -13,11 +13,13 @@ import java.io.*;
 public class Audit implements Runnable{
 
     private String ip;
+    private BufferedWriter f;
     // NOTE: Currently, nmap4j only works for POSIX machines.
     private Nmap4j nmap4j = new Nmap4j("/usr/local");
 
-    public Audit(String ip){
+    public Audit(String ip, BufferedWriter f){
         this.ip = ip;
+        this.f = f;
     }
 
 
@@ -73,7 +75,14 @@ public class Audit implements Runnable{
                     System.out.println("Port: " + eElement.getAttribute("portid"));
                 }
             }
-            System.out.println(nmap4j.getOutput());
+            // Write the entire XML to a log file.
+            synchronized (f){
+                try {
+                    f.write(nmap4j.getOutput());
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
         } else {
             System.out.println(nmap4j.getExecutionResults().getErrors());
         }

@@ -61,7 +61,7 @@ public class main {
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
 
-
+       BufferedWriter f = new BufferedWriter(new FileWriter("../xml.log"));
        System.out.println("Starting Scan...");
        Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
        Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
@@ -126,7 +126,7 @@ public class main {
        int i = 0;
        start = clock.millis();
        while (tmp != null){// This loops over all elements in the linkedlist and starts an NMAP thread for each one.
-           auditPool[i] = new Audit(tmp.val);
+           auditPool[i] = new Audit(tmp.val, f);
            threads[i] = new Thread(auditPool[i], "Auditor " + i);
            threads[i].start();
            i++;
@@ -141,6 +141,7 @@ public class main {
         }
         end = clock.millis();
         System.out.println("We audited " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
+        f.close();
     }
 
     public static void printOpening(){// Because what program is complete without ASCII art?
