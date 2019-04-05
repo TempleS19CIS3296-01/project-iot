@@ -36,9 +36,10 @@ public class Audit implements Runnable{
         if (!nmap4j.hasError()) {
             // Everything we do could throw an error!!
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = null;
-            ByteArrayInputStream input = null;
-            Document doc = null;
+            DocumentBuilder builder;
+            ByteArrayInputStream input;
+            Document doc;
+            NodeList nList;
             // I honestly have no idea what any of this does but it is more or less copied from GeeksForGeeks so it must be good.
             try {
                 builder = factory.newDocumentBuilder();
@@ -56,13 +57,22 @@ public class Audit implements Runnable{
             }
             try {
                 doc = builder.parse(input);
+
             } catch (SAXException | IOException e){
                 e.printStackTrace();
                 return;
             }
+            doc.getDocumentElement().normalize();
             // This begins the XML parsing.
-            Element root = doc.getDocumentElement();
-            System.out.println(root.getAttribute("ports"));
+            //Element root = doc.getDocumentElement();
+            nList = doc.getElementsByTagName("port");
+            for (int tmp = 0; tmp < nList.getLength(); tmp++){
+                Node nNode = nList.item(tmp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE){
+                    Element eElement = (Element)nNode;
+                    System.out.println("Port: " + eElement.getAttribute("portid"));
+                }
+            }
             System.out.println(nmap4j.getOutput());
         } else {
             System.out.println(nmap4j.getExecutionResults().getErrors());
