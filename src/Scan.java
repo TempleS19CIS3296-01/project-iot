@@ -23,6 +23,7 @@ public class Scan implements Runnable{
         String deviceName;
         InetAddress IP = null;
         try {
+            // Try to ping the IP address. Note: isReachable is flawed and pat is working to fix it.
             IP = InetAddress.getByName(ipAddress);
             try {
                 if (IP.isReachable(5000)) {
