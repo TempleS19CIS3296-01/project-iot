@@ -33,10 +33,12 @@ public class main {
         int index2 = 0;
         String s;
         while(index2 < Math.ceil(1.0*max/NUM_WORKERS)){
-            // If we have already populated 255 ip addresses, then add null.
+
             if (index2 * NUM_WORKERS + index1 >= max){
+                // If we have already populated 255 ip addresses, then add null.
                 s = null;
             } else {
+                // Otherwise, populate the next ip address into IPs.
                 s = ip + "." + min;
             }
             IPs[index1][index2] = s;
@@ -50,31 +52,6 @@ public class main {
         return IPs;
     }
 
-
-
-    /*
-     * This is the simplified way to execute and parse Nmap output.  This is the
-     * easiest way to run Nmap from this API.  Use of this class requires a little
-     * more knowledge of Nmap's flags in order to work.
-     * <p>
-     * Here is an example of how to use this class:
-     * <code>
-     * Nmap4j nmap4j = new Nmap4j( "/usr/local" ) ;
-     * nmap4j.includeHosts( "192.168.1.1-255" ) ;
-     * nmap4j.excludeHosts( "192.168.1.110" ) ;
-     * nmap4j.addFlags( "-T3 -oX - -O -sV" ) ;
-     * nmap4j.execute() ;
-     * if( !nma4j.hasError() ) {
-     * NMapRun nmapRun = nmap4j.getResults() ;
-     * } else {
-     * System.out.println( nmap4j.getExecutionResults().getErrors() ) ;
-     * }
-     * </code>
-     * <p>
-     * This block would need a try/catch because the execute() method throws two
-     * different exceptions.
-     *
-     */
     // Driver code
     public static void main(String[] args) throws IOException {
 
@@ -84,12 +61,13 @@ public class main {
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
 
+
+       System.out.println("Starting Scan...");
        Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
        Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
        String[][] IPMax;// 2d array so that each thread can get its own IPrange.
        LinkedList2 hits = new LinkedList2();// Keep a linked list for storing all ip addresses we find.
-       Clock clock = Clock.systemDefaultZone();
-       System.out.println("Starting Scan...");
+       Clock clock = Clock.systemDefaultZone();// Clock for timing.
        long start = clock.millis();
        switch(choice) {
            case 1:
@@ -134,20 +112,20 @@ public class main {
        }
         for (int i = 0; i < NUM_WORKERS; i++){
             if(pool[i].getDevicesFound() == 0) {
-                continue;//don't print threads that returned no devices.
+                continue;// Don't print threads that returned no devices.
             }
             System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
         }
        long end = clock.millis();
        System.out.println("We found " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
 
+       System.out.println("Starting nmap of all found devices...");
        Audit[] auditPool = new Audit[hits.length()];
        threads = new Thread[hits.length()];
        LinkedList2.Node tmp = hits.head.next;
        int i = 0;
-       System.out.println("Starting nmap of all found devices...");
        start = clock.millis();
-       while (tmp != null){
+       while (tmp != null){// This loops over all elements in the linkedlist and starts an NMAP thread for each one.
            auditPool[i] = new Audit(tmp.val);
            threads[i] = new Thread(auditPool[i], "Auditor " + i);
            threads[i].start();
@@ -165,7 +143,7 @@ public class main {
         System.out.println("We audited " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
     }
 
-    public static void printOpening(){
+    public static void printOpening(){// Because what program is complete without ASCII art?
         System.out.println();
         System.out.println(" $$$$$$\\  $$\\   $$\\ $$$$$$\\ $$$$$$$$\\          $$$$$$\\   $$$$$$\\   $$$$$$\\  $$\\   $$\\ $$\\   $$\\ $$$$$$$$\\ $$$$$$$\\");
         System.out.println("$$  __$$\\ $$ |  $$ |\\_$$  _|\\__$$  __|        $$  __$$\\ $$  __$$\\ $$  __$$\\ $$$\\  $$ |$$$\\  $$ |$$  _____|$$  __$$\\");
