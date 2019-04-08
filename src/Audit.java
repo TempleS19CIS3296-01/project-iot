@@ -23,7 +23,7 @@ public class Audit implements Runnable{
         this.f = f;
         if (isWindows()) {
             nmap = new Nmap4j("/c/Program Files/Nmap/nmap");
-        } else if (isMac()) {
+        } else {
             nmap = new Nmap4j("/usr/local");
         }
     }
