@@ -21,7 +21,6 @@ public class Audit implements Runnable{
     public Audit(String ip, BufferedWriter f) {
         this.ip = ip;
         this.f = f;
-        //System.out.println(OS);
         if (isWindows()) {
             nmap = new Nmap4j("/c/Program Files/Nmap/nmap");
         } else {
