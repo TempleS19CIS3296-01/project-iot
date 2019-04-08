@@ -15,27 +15,33 @@ public class Audit implements Runnable{
     private String ip;
     private BufferedWriter f;
     // NOTE: Currently, nmap4j only works for POSIX machines.
-    private Nmap4j nmap4j = new Nmap4j("/usr/local");
+    private static String OS = System.getProperty("os.name").toLowerCase();
+    private Nmap4j nmap;
 
-    public Audit(String ip, BufferedWriter f){
+    public Audit(String ip, BufferedWriter f) {
         this.ip = ip;
         this.f = f;
+        if (isWindows()) {
+            nmap = new Nmap4j("/c/Program Files/Nmap/nmap");
+        } else if (isMac()) {
+            nmap = new Nmap4j("/usr/local");
+        }
     }
 
 
     @Override
     public void run() {
         // includeHosts adds the ip address to be audited.
-        nmap4j.includeHosts(ip);
+        nmap.includeHosts(ip);
         // -Pn treats the host as online, so we don't get blocked.
-        nmap4j.addFlags("-Pn");
+        nmap.addFlags("-Pn");
         try {
             // If this execution does not have an error, the output will be an XML string.
-            nmap4j.execute();
+            nmap.execute();
         } catch (NMapInitializationException | NMapExecutionException e){
             e.printStackTrace();
         }
-        if (!nmap4j.hasError()) {
+        if (!nmap.hasError()) {
             // Everything we do could throw an error!!
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder;
@@ -50,7 +56,7 @@ public class Audit implements Runnable{
                 return;
             }
             StringBuilder xmlStringBuilder = new StringBuilder();
-            xmlStringBuilder.append(nmap4j.getOutput());
+            xmlStringBuilder.append(nmap.getOutput());
             try {
                 input = new ByteArrayInputStream(xmlStringBuilder.toString().getBytes("UTF-8"));
             } catch (UnsupportedEncodingException e){
@@ -68,24 +74,49 @@ public class Audit implements Runnable{
             // This begins the XML parsing.
             //Element root = doc.getDocumentElement();
             nList = doc.getElementsByTagName("port");
-            for (int tmp = 0; tmp < nList.getLength(); tmp++){
+            int nListLength = nList.getLength();
+            if (nListLength > 0){
+                System.out.println("IP address: " + ip);
+                System.out.print("Ports: ");
+            }
+            for (int tmp = 0; tmp < nListLength; tmp++){
                 Node nNode = nList.item(tmp);
                 if (nNode.getNodeType() == Node.ELEMENT_NODE){
                     Element eElement = (Element)nNode;
-                    System.out.println("Port: " + eElement.getAttribute("portid"));
+                    // Formatting to prevent a comma on the last element.
+                    if (tmp < nListLength - 1) {
+                        System.out.print(eElement.getAttribute("portid") + ", ");
+                    } else {
+                        System.out.println(eElement.getAttribute("portid"));
+                    }
                 }
             }
             // Write the entire XML to a log file.
             synchronized (f){
                 try {
-                    f.write(nmap4j.getOutput());
+                    f.write(nmap.getOutput());
                 } catch (IOException e){
                     e.printStackTrace();
                 }
             }
         } else {
-            System.out.println(nmap4j.getExecutionResults().getErrors());
+            System.out.println(nmap.getExecutionResults().getErrors());
         }
 
     }
+
+    // The following functions test for different Operating Systems.
+    public static boolean isWindows() {
+        return (OS.indexOf("win") >= 0);
+    }
+    public static boolean isMac() {
+        return (OS.indexOf("mac") >= 0);
+    }
+    public static boolean isUnix() {
+        return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
+    }
+    public static boolean isSolaris() {
+        return (OS.indexOf("sunos") >= 0);
+    }
+
 }

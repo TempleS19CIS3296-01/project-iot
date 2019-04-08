@@ -61,7 +61,7 @@ public class main {
                 "range (2)? Enter 1 or 2.");
        int choice = scan.nextInt();
 
-       BufferedWriter f = new BufferedWriter(new FileWriter("xml.log"));
+       BufferedWriter f = new BufferedWriter(new FileWriter("log.xml"));
        System.out.println("Starting Scan...");
        Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
        Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
