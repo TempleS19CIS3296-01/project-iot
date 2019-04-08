@@ -21,6 +21,7 @@ public class Audit implements Runnable{
     public Audit(String ip, BufferedWriter f) {
         this.ip = ip;
         this.f = f;
+        //System.out.println(OS);
         if (isWindows()) {
             nmap = new Nmap4j("/c/Program Files/Nmap/nmap");
         } else {
@@ -116,7 +117,7 @@ public class Audit implements Runnable{
         return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix"));
     }
     public static boolean isSolaris() {
-        return (OS.contains("sunos");
+        return (OS.contains("sunos"));
     }
 
 }
