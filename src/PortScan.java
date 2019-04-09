@@ -10,6 +10,7 @@ public class PortScan implements Runnable{
 
     @Override
     public void run() {
+        System.out.println("Starting port sweep of IP: " + ip);
         for (int port = 1; port <= 65535; port++) {
             try {
                 Socket socket = new Socket();
