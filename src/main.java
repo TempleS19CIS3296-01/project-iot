@@ -119,17 +119,39 @@ public class main {
        long end = clock.millis();
        System.out.println("We found " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
 
-       System.out.println("Starting nmap of all found devices...");
-       Audit[] auditPool = new Audit[hits.length()];
+
+       PortScan[] scanPool = new PortScan[hits.length()];
        threads = new Thread[hits.length()];
        LinkedList2.Node tmp = hits.head.next;
        int i = 0;
+       start = clock.millis();
+       while (tmp != null){
+           scanPool[i] = new PortScan(tmp.val);
+           threads[i] = new Thread(scanPool[i], "PortScanner" + i);
+           threads[i].start();
+           i++;
+           tmp = tmp.next;
+       }
+       for (i = 0; i < scanPool.length; i++){
+           try {
+               threads[i].join();
+           } catch(InterruptedException e){
+               e.printStackTrace();
+           }
+       }
+       end = clock.millis();
+       System.out.println("We port-scanned " + hits.length() + " devices in " + (end - start) / 1000.0 + " seconds.");
+
+       System.out.println("Starting nmap of all found devices...");
+       Audit[] auditPool = new Audit[hits.length()];
+       threads = new Thread[hits.length()];
+       tmp = hits.head.next;
+       i = 0;
        start = clock.millis();
        while (tmp != null){// This loops over all elements in the linkedlist and starts an NMAP thread for each one.
            auditPool[i] = new Audit(tmp.val, f);
            threads[i] = new Thread(auditPool[i], "Auditor " + i);
            threads[i].start();
-           i++;
            tmp = tmp.next;
        }
         for (i = 0; i < auditPool.length; i++){

@@ -9,6 +9,10 @@ import org.xml.sax.SAXException;
 import javax.swing.text.html.parser.Parser;
 import javax.xml.parsers.*;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 
 public class Audit implements Runnable{
 
@@ -102,7 +106,6 @@ public class Audit implements Runnable{
         } else {
             System.out.println(nmap.getExecutionResults().getErrors());
         }
-
     }
 
     // The following functions test for different Operating Systems.
