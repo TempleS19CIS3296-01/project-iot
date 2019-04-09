@@ -4,15 +4,16 @@ import java.net.Socket;
 import java.io.*;
 import java.net.InetSocketAddress;
 
-public class PortScanner{
+public class PortScanner implements Runnable{
     private int timeout;
+    private LinkedList<Integer> ports;
 
     public PortScanner(int toVal){
         this.timeout = toVal; 
     }
     
-    public LinkedList<Integer> checkOpenPorts(String IP){
-        LinkedList<Integer> ports = new LinkedList<Integer>();
+    public void run(){
+
         for(int i = 0; i < 65535; i++){
             try {
                 Socket socket = new Socket();
@@ -24,6 +25,5 @@ public class PortScanner{
                 continue;
             }
         }
-        return ports;
     }
 }
