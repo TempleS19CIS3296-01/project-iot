@@ -5,25 +5,24 @@ import java.io.*;
 import java.net.InetSocketAddress;
 
 public class PortScanner implements Runnable{
-    private int timeout;
     private LinkedList<Integer> ports;
+    private String IP;
 
-    public PortScanner(int toVal){
-        this.timeout = toVal; 
+    public PortScanner(String ip){
+        IP = ip;
     }
     
     public void run(){
-
         for(int i = 0; i < 65535; i++){
             try {
                 Socket socket = new Socket();
-                socket.connect(new InetSocketAddress(IP, i), timeout);
+                socket.connect(new InetSocketAddress(IP, i), 300);
                 socket.close();
-                ports.add(i);
-                System.out.println("Open Port found at : " + i);
             } catch (Exception ex) {
                 continue;
             }
+            ports.add(i);
+            System.out.println("Open Port found at : " + i);
         }
     }
 }
