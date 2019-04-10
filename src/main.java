@@ -132,7 +132,7 @@ public class main {
            tmp = tmp.next;
            i++;
        }
-       end = clock.millis();
+
        for (i = 0; i < hits.length(); i++){
            try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
                threads[i].join();
@@ -140,6 +140,7 @@ public class main {
                System.out.println("Interrupted during join");
            }
        }
+       end = clock.millis();
        System.out.println("We swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
     }
 
