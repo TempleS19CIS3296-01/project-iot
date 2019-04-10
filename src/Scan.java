@@ -1,15 +1,14 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
 
 public class Scan implements Runnable{
 
     private volatile int devicesFound = 0;// Count how many devices we detected.
     private String[] subnetRange;
-    private LinkedList hits;
+    private LinkedListString hits;
 
-    public Scan(LinkedList hits, String[] subnetRange){
+    public Scan(LinkedListString hits, String[] subnetRange){
         this.hits = hits;
         this.subnetRange = subnetRange;
     }
@@ -31,7 +30,7 @@ public class Scan implements Runnable{
                             IP.getCanonicalHostName());
                     devicesFound++;
                     synchronized (hits) {
-                        hits.push(ipAddress);
+                        hits.add(ipAddress);
                     }
                 } //else
                     //System.out.println("PING FAILED: " + ipAddress);
