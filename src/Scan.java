@@ -25,7 +25,7 @@ public class Scan implements Runnable{
         try {
             IP = InetAddress.getByName(ipAddress);
             try {
-                if (IP.isReachable(5000)) {
+                if (IP.isReachable(300)) {
                     System.out.println("\nHost is reachable with IP Address: " + ipAddress + "\nHost name: " +
                             IP.getCanonicalHostName());
                     devicesFound++;
