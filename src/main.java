@@ -7,7 +7,7 @@ help for updating if devices need to be. All will be printed in audit.
 
 import java.net.InetAddress;
 import java.io.*;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.time.Clock;
 
@@ -64,12 +64,9 @@ public class main {
        Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
        Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
        String[][] IPMax;// 2d array so that each thread can get its own IPrange.
-       LinkedList hits = new LinkedList();// Keep a linked list for storing all ip addresses we find.
+       LinkedListString hits = new LinkedListString();// Keep a linked list for storing all ip addresses we find.
        Clock clock = Clock.systemDefaultZone();
        long start = clock.millis();
-       PortScanner portScan = new PortScanner(300);
-       String foundIP;
-       LinkedList<Integer> openPorts = new LinkedList<Integer>();
        switch(choice) {
            case 1:
                InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
@@ -85,11 +82,6 @@ public class main {
                    threads[i].start();// Start all threads.
                }
                //needs to wait till all threads are done
-               foundIP = hits.getFirst().toString();
-               //String foundIP = "10.0.0.1"; manual run, currently takes forever. need to make it multi-threaded.
-               System.out.println("first IP found is :" + foundIP);
-               openPorts = portScan.checkOpenPorts(foundIP);
-               System.out.println("open ports found for the first found IP are : " + openPorts.toString());
                break;
            case 2:
                System.out.println("Enter your desired subnet to scan: ");
@@ -104,13 +96,7 @@ public class main {
                    threads[i].start();// But they do.
                }
                //needs to wait till all threads are done
-               foundIP = hits.getFirst().toString();
-               //String foundIP = "10.0.0.1"; manual run, currently takes forever. need to make it multi-threaded.
-               System.out.println("first IP found is :" + foundIP);
-               openPorts = portScan.checkOpenPorts(foundIP);
-               System.out.println("open ports found for the first found IP are : " + openPorts.toString());
                break;
-
            default:
                System.out.println("Error: value entered was not in range.");
                System.exit(0);
@@ -130,7 +116,32 @@ public class main {
             System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
         }
        long end = clock.millis();
-       System.out.println("We found " + hits.size() + " devices in " + (end - start) / 1000 + " seconds.");
+       System.out.println("We found " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+
+       System.out.println("Starting port sweep of all devices...");
+       PortScanner[] portPool = new PortScanner[hits.length()];
+       threads = new Thread[hits.length()];
+       HashMap<String, LinkedListInt> openPorts = new HashMap<>();
+       int i = 0;
+       LinkedListString.Node tmp = hits.head.next;
+       start = clock.millis();
+       while (tmp != null){
+           portPool[i] = new PortScanner(openPorts, tmp.val);
+           threads[i] = new Thread(portPool[i], "PortScanner " + i);
+           threads[i].start();
+           tmp = tmp.next;
+           i++;
+       }
+
+       for (i = 0; i < hits.length(); i++){
+           try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
+               threads[i].join();
+           } catch (InterruptedException e){
+               System.out.println("Interrupted during join");
+           }
+       }
+       end = clock.millis();
+       System.out.println("We swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
     }
 
     public static void printOpening(){
