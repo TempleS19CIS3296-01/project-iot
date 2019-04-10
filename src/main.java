@@ -17,6 +17,15 @@ public class main {
     static final int NUM_WORKERS = 255;// How many threads we have going.
 
 
+    // ASCII COLORS
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+
 
     /**
      * Populates an array of IP addresses
@@ -146,14 +155,14 @@ public class main {
 
     public static void printOpening(){
         System.out.println();
-        System.out.println(" $$$$$$\\  $$\\   $$\\ $$$$$$\\ $$$$$$$$\\          $$$$$$\\   $$$$$$\\   $$$$$$\\  $$\\   $$\\ $$\\   $$\\ $$$$$$$$\\ $$$$$$$\\");
-        System.out.println("$$  __$$\\ $$ |  $$ |\\_$$  _|\\__$$  __|        $$  __$$\\ $$  __$$\\ $$  __$$\\ $$$\\  $$ |$$$\\  $$ |$$  _____|$$  __$$\\");
-        System.out.println("$$ /  \\__|$$ |  $$ |  $$ |     $$ |           $$ /  \\__|$$ /  \\__|$$ /  $$ |$$$$\\ $$ |$$$$\\ $$ |$$ |      $$ |  $$ |");
-        System.out.println("\\$$$$$$\\  $$$$$$$$ |  $$ |     $$ |           \\$$$$$$\\  $$ |      $$$$$$$$ |$$ $$\\$$ |$$ $$\\$$ |$$$$$\\    $$$$$$$  |");
-        System.out.println(" \\____$$\\ $$  __$$ |  $$ |     $$ |            \\____$$\\ $$ |      $$  __$$ |$$ \\$$$$ |$$ \\$$$$ |$$  __|   $$  __$$<");
-        System.out.println("$$\\   $$ |$$ |  $$ |  $$ |     $$ |           $$\\   $$ |$$ |  $$\\ $$ |  $$ |$$ |\\$$$ |$$ |\\$$$ |$$ |      $$ |  $$ |");
-        System.out.println("\\$$$$$$  |$$ |  $$ |$$$$$$\\    $$ |           \\$$$$$$  |\\$$$$$$  |$$ |  $$ |$$ | \\$$ |$$ | \\$$ |$$$$$$$$\\ $$ |  $$ |");
-        System.out.println(" \\______/ \\__|  \\__|\\______|   \\__|            \\______/  \\______/ \\__|  \\__|\\__|  \\__|\\__|  \\__|\\________|\\__|  \\__|");
+        System.out.println(ANSI_RED+" $$$$$$\\"+ANSI_YELLOW+"  $$\\   $$\\"+ANSI_GREEN+" $$$$$$\\"+ANSI_CYAN+" $$$$$$$$\\         "+ANSI_BLUE+" $$$$$$\\  "+ANSI_PURPLE+" $$$$$$\\"+ANSI_RED+"   $$$$$$\\ "+ANSI_YELLOW+" $$\\   $$\\"+ANSI_GREEN+" $$\\   $$\\"+ANSI_CYAN+" $$$$$$$$\\ "+ANSI_BLUE+"$$$$$$$\\");
+        System.out.println(ANSI_RED+"$$  __$$\\"+ANSI_YELLOW+" $$ |  $$ |"+ANSI_GREEN+"\\_$$  _|"+ANSI_CYAN+"\\__$$  __|       "+ANSI_BLUE+" $$  __$$\\ "+ANSI_PURPLE+"$$  __$$\\"+ANSI_RED+" $$  __$$\\"+ANSI_YELLOW+" $$$\\  $$ |"+ANSI_GREEN+"$$$\\  $$ |"+ANSI_CYAN+"$$  _____|"+ANSI_BLUE+"$$  __$$\\");
+        System.out.println(ANSI_RED+"$$ /  \\__|"+ANSI_YELLOW+"$$ |  $$ |"+ANSI_GREEN+"  $$ |     "+ANSI_CYAN+"$$ |           "+ANSI_BLUE+"$$ /  \\__|"+ANSI_PURPLE+"$$ /  \\__|"+ANSI_RED+"$$ /  $$ |"+ANSI_YELLOW+"$$$$\\ $$ |"+ANSI_GREEN+"$$$$\\ $$ |"+ANSI_CYAN+"$$ |      "+ANSI_BLUE+"$$ |  $$ |");
+        System.out.println(ANSI_RED+"\\$$$$$$\\  "+ANSI_YELLOW+"$$$$$$$$ |"+ANSI_GREEN+"  $$ |     "+ANSI_CYAN+"$$ |          "+ANSI_BLUE+" \\$$$$$$\\  "+ANSI_PURPLE+"$$ |      "+ANSI_RED+"$$$$$$$$ |"+ANSI_YELLOW+"$$ $$\\$$ |"+ANSI_GREEN+"$$ $$\\$$ |"+ANSI_CYAN+"$$$$$\\    "+ANSI_BLUE+"$$$$$$$  |");
+        System.out.println(ANSI_RED+" \\____$$\\ "+ANSI_YELLOW+"$$  __$$ |"+ANSI_GREEN+"  $$ | "+ANSI_CYAN+"    $$ |            "+ANSI_BLUE+"\\____$$\\"+ANSI_PURPLE+" $$ |      "+ANSI_RED+"$$  __$$ |"+ANSI_YELLOW+"$$ \\$$$$ |"+ANSI_GREEN+"$$ \\$$$$ |"+ANSI_CYAN+"$$  __|"+ANSI_BLUE+"   $$  __$$<");
+        System.out.println(ANSI_RED+"$$\\   $$ |"+ANSI_YELLOW+"$$ |  $$ |"+ANSI_GREEN+"  $$ |     "+ANSI_CYAN+"$$ |           "+ANSI_BLUE+"$$\\   $$ |"+ANSI_PURPLE+"$$ |  $$\\"+ANSI_RED+" $$ |  $$ |"+ANSI_YELLOW+"$$ |\\$$$ |"+ANSI_GREEN+"$$ |\\$$$ |"+ANSI_CYAN+"$$ |      "+ANSI_BLUE+"$$ |  $$ |");
+        System.out.println(ANSI_RED+"\\$$$$$$  |"+ANSI_YELLOW+"$$ |  $$ |"+ANSI_GREEN+"$$$$$$\\    "+ANSI_CYAN+"$$ |           "+ANSI_BLUE+"\\$$$$$$  |"+ANSI_PURPLE+"\\$$$$$$  |"+ANSI_RED+"$$ |  $$ |"+ANSI_YELLOW+"$$ | \\$$ |"+ANSI_GREEN+"$$ | \\$$ |"+ANSI_CYAN+"$$$$$$$$\\ "+ANSI_BLUE+"$$ |  $$ |");
+        System.out.println(ANSI_RED+" \\______/ "+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\______|   "+ANSI_CYAN+"\\__|           "+ANSI_BLUE+" \\______/  "+ANSI_PURPLE+"\\______/ "+ANSI_RED+"\\__|  \\__|"+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\__|  \\__|"+ANSI_CYAN+"\\________|"+ANSI_BLUE+"\\__|  \\__|"+ANSI_RESET);
         System.out.println();
     }
 }
