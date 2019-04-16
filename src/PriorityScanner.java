@@ -4,13 +4,13 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 
 
-public class PortScanner implements Runnable{
+public class PriorityScanner implements Runnable{
     private HashMap<String, LinkedListInt> portMap;
     private String IP;
     LinkedListInt targetPorts;
 
 
-    public PortScanner(HashMap portMap, String ip){
+    public PriorityScanner(HashMap portMap, String ip){
         this.portMap = portMap;
         IP = ip;
         targetPorts = getTargetPorts();//generate list of "high risk" ports
@@ -21,7 +21,7 @@ public class PortScanner implements Runnable{
         LinkedListInt.Node port = targetPorts.head.next;
         boolean morePorts = true;
 
-        while(morePorts){
+        while (morePorts){
             try {
                 // Try to establish a socket connection with IP and port.
                 // TODO: timeout? Is 300 a good number?
@@ -46,15 +46,13 @@ public class PortScanner implements Runnable{
             } catch (Exception ex) {
             }
 
-            if(port.next == null){
+            if (port.next == null){
                 morePorts = false;//if there are no more ports, exit while loop
             }
-            else port = port.next;//otherwise, go to next port
+            else {
+                port = port.next;//otherwise, go to next port
+            }
         }
-    }
-    // Accessor for ports.
-    public HashMap getPorts(){
-        return portMap;
     }
 
     // Get linkedlist of target ports - eventually, this should be generated from our database
