@@ -2,13 +2,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class Scan implements Runnable{
+public class IPScan implements Runnable{
 
     private volatile int devicesFound = 0;// Count how many devices we detected.
     private String[] subnetRange;
     private LinkedListString hits;
 
-    public Scan(LinkedListString hits, String[] subnetRange){
+    public IPScan(LinkedListString hits, String[] subnetRange){
         this.hits = hits;
         this.subnetRange = subnetRange;
     }

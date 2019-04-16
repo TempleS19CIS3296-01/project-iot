@@ -68,14 +68,25 @@ public class main {
        printOpening();
        System.out.println("Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
-       int choice = scan.nextInt();
+       int choice = scan.nextInt();// TODO: is this really necessary?
 
-       Scan[] pool = new Scan[NUM_WORKERS];// Our pool of SHIT-scanners.
-       Thread[] threads = new Thread[NUM_WORKERS];// Pool of threads........ this gets awkward.
-       String[][] IPMax;// 2d array so that each thread can get its own IPrange.
-       LinkedListString hits = new LinkedListString();// Keep a linked list for storing all ip addresses we find.
+        /*
+        Initialize the pool of scanners as well as the pool of threads.
+        We have a matrix of IP addresses, which will divide up enough IP addresses for each thread.
+        Then, we also make a linked list to keep track of all IP addresses which contain a device.
+         */
+       IPScan[] pool = new IPScan[NUM_WORKERS];
+       Thread[] threads = new Thread[NUM_WORKERS];
+       String[][] IPMax;
+       LinkedListString hits = new LinkedListString();
        Clock clock = Clock.systemDefaultZone();
        long start = clock.millis();
+
+       /*
+       We get the user's IP address, then populate our IP matrix with all possible IP addresses within the range 0-255.
+       Loop through the pool of Scanners, initialize them, and start the thread to scan over all IP addresses given to that thread.
+       This will also extend to the linked list as soon as we find an IP address that contains a device.
+        */
        switch(choice) {
            case 1:
                InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
@@ -86,7 +97,7 @@ public class main {
                IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
                // EVERYONE GET READY TO START YOUR ENGINES.
                for (int i = 0; i < NUM_WORKERS; i++){
-                   pool[i] = new Scan(hits, IPMax[i]);
+                   pool[i] = new IPScan(hits, IPMax[i]);
                    threads[i] = new Thread(pool[i], "Worker " + i);
                    threads[i].start();// Start all threads.
                }
@@ -100,7 +111,7 @@ public class main {
                IPMax = populateIPRange(sub, 1, maxRange);
                // I don't want these engines to start.
                for (int i = 0; i < NUM_WORKERS; i++){
-                   pool[i] = new Scan(hits, IPMax[i]);
+                   pool[i] = new IPScan(hits, IPMax[i]);
                    threads[i] = new Thread(pool[i], "Worker " + i);
                    threads[i].start();// But they do.
                }
@@ -111,61 +122,93 @@ public class main {
                System.exit(0);
        }
 
-       for (int i = 0; i < NUM_WORKERS; i++){
-           try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
+       /*
+       Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
+       Print a report per worker letting us know how many devices the worker found.
+       If a worker does not find any devices, don't bother printing it out.
+        */
+       for (int i = 0; i < NUM_WORKERS; i++) {
+           try {
                threads[i].join();
-           } catch (InterruptedException e){
+
+           } catch (InterruptedException e) {
                System.out.println("Interrupted during join");
+               continue;
            }
+           if (pool[i].getDevicesFound() == 0) {
+               continue;
+           }
+           System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
        }
-        for (int i = 0; i < NUM_WORKERS; i++){
-            if(pool[i].getDevicesFound() == 0) {
-                continue;//don't print threads that returned no devices.
-            }
-            System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
-        }
+       // Timing report.
        long end = clock.millis();
        System.out.println("We found " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
 
+       /*
+       Begin to sweep ver the ports.
+       This requires making 2 pools of port scanners: one for priority ports and one for non-priority ports.
+       We also create a pool of threads for both port scanners.
+       Each IP address we found is given a thread.
+       We make 2 hashmaps, which map String keys to a linkedlist of integers. The linkedlist contains all open ports for the given String (which is an IP address).
+        */
        System.out.println("Starting port sweep of all devices...");
-       PortScanner[] portPool = new PortScanner[hits.length()];
-       threads = new Thread[hits.length()];
-       HashMap<String, LinkedListInt> openPorts = new HashMap<>();
+       PriorityScanner[] priorityPortPool = new PriorityScanner[hits.length()];
+       WorkerScanner[] workerPortPool = new WorkerScanner[hits.length()];
+       Thread[] priorityThreads = new Thread[hits.length()];
+       Thread[] workerThreads = new Thread[hits.length()];
+       HashMap<String, LinkedListInt> priorityPortMap = new HashMap<>();
+       HashMap<String, LinkedListInt>  workerPortMap = new HashMap<>();
+       // i is used for placeholders in the pool arrays. It's more important to make sure tmp (the linkedList node) is not null, so we use a while loop instead of for loop over i.
        int i = 0;
        LinkedListString.Node tmp = hits.head.next;
        start = clock.millis();
        while (tmp != null){
-           portPool[i] = new PortScanner(openPorts, tmp.val);
-           threads[i] = new Thread(portPool[i], "PortScanner " + i);
-           threads[i].start();
+           /*
+           Instantiate the pool of scanners, and start them.
+            */
+           priorityPortPool[i] = new PriorityScanner(priorityPortMap, tmp.val);
+           priorityThreads[i] = new Thread(priorityPortPool[i], "PriorityScanner " + i);
+           priorityThreads[i].start();
+           workerPortPool[i] = new WorkerScanner(workerPortMap, tmp.val);
+           workerThreads[i] = new Thread(workerPortPool[i], "WorkerScanner " + i);
+           workerThreads[i].start();
            tmp = tmp.next;
            i++;
        }
-
+        /*
+        We need to wait for the priority threads to finish so that we can report on the priority ports we scanned.
+         */
        for (i = 0; i < hits.length(); i++){
            try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
-               threads[i].join();
+               priorityThreads[i].join();
            } catch (InterruptedException e){
                System.out.println("Interrupted during join");
            }
        }
-       end = clock.millis();
+       end = clock.millis();// Time reports.
        System.out.println("We swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
 
        // portIP is a dictionary where each key is a string representing the IP address and each value is a LinkedList representing all accessible Ports.
-       HashMap portIP = portPool[0].getPorts();
 
        // To get the set of all keys, use portIP.keySet().
-       for (Object key : portIP.keySet()){
+       for (Object key : priorityPortMap.keySet()){
            // To access a certain element, use get.
-           LinkedListInt element = (LinkedListInt)portIP.get((String)key);
+           LinkedListInt element = (LinkedListInt)priorityPortMap.get((String)key);
            // Example of how to get ip-port pair.
            String ipAddress = (String) key;
            int portNumber = element.remove();
        }
 
-
-
+       System.out.println("Thank you for your business, your SHIT has been scanned!");
+       System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
+        // TODO: Figure out where to put this?!?
+        for (i = 0; i < hits.length(); i++){
+            try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
+                workerThreads[i].join();
+            } catch (InterruptedException e){
+                System.out.println("Interrupted during join");
+            }
+        }
     }
 
     public static void printOpening(){

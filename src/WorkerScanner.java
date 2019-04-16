@@ -3,15 +3,15 @@ import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
-public class PortScanner implements Runnable{
+public class WorkerScanner implements Runnable{
     private HashMap<String, LinkedListInt> portMap;
     private String IP;
 
-    public PortScanner(HashMap portMap, String ip){
+    public WorkerScanner(HashMap portMap, String ip){
         this.portMap = portMap;
         IP = ip;
     }
-    
+
     public void run(){
         // Iterate over all ports.
         for(int port = 0; port < 65535; port++){
@@ -35,14 +35,11 @@ public class PortScanner implements Runnable{
                         portMap.put(IP, portList);
                     }
                 }
+                // TODO: We don't want worker threads printing.
                 System.out.println("IP: "+ IP+ " port found at : " + port);
             } catch (Exception ex) {
             }
 
         }
-    }
-    // Accessor for ports.
-    public HashMap getPorts(){
-        return portMap;
     }
 }
