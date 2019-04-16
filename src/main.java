@@ -151,6 +151,21 @@ public class main {
        }
        end = clock.millis();
        System.out.println("We swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+
+       // portIP is a dictionary where each key is a string representing the IP address and each value is a LinkedList representing all accessible Ports.
+       HashMap portIP = portPool[0].getPorts();
+
+       // To get the set of all keys, use portIP.keySet().
+       for (Object key : portIP.keySet()){
+           // To access a certain element, use get.
+           LinkedListInt element = (LinkedListInt)portIP.get((String)key);
+           // Example of how to get ip-port pair.
+           String ipAddress = (String) key;
+           int portNumber = element.remove();
+       }
+
+
+
     }
 
     public static void printOpening(){

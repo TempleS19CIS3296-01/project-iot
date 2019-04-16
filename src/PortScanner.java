@@ -13,13 +13,18 @@ public class PortScanner implements Runnable{
     }
     
     public void run(){
-        // omp parallel for
+        // Iterate over all ports.
         for(int port = 0; port < 65535; port++){
             try {
+                // Try to establish a socket connection with IP and port.
+                // TODO: timeout? Is 300 a good number?
                 Socket socket = new Socket();
                 socket.connect(new InetSocketAddress(IP, port), 300);
                 socket.close();
+                // TODO: Do we need synchronized? no other thread will have the same IP address.
                 synchronized (portMap) {
+                    // If there is already an entry the hashmap, add to the linked list.
+                    // Otherwise, create a new linkedlist and add that to the hashmap.
                     LinkedListInt portList = portMap.get(IP);
                     if (portList != null){// If we already have an element for this IP address.
                         portList.add(port);
