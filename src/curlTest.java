@@ -2,6 +2,7 @@ import com.google.gson.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 
@@ -24,9 +25,20 @@ public class curlTest {
         return json;
     }
 
+    public static boolean successfullSocketConn(URL url) throws IOException {
+        HttpURLConnection socketConn = (HttpURLConnection)url.openConnection();
+        if (socketConn.getResponseCode() == 200){
+            return true;
+        }
+        return false;
+    }
+
     public static void main(String[] args) throws IOException {
 
         URL url = new URL("http://10.0.0.7:8008/setup/eureka_info");
-        System.out.println(jsonConverter(url));
+
+        if (successfullSocketConn(url) == true){
+            System.out.println(jsonConverter(url));
+        }
     }
 }
