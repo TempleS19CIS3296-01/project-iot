@@ -151,7 +151,7 @@ public class main {
        Each IP address we found is given a thread.
        We make 2 hashmaps, which map String keys to a linkedlist of integers. The linkedlist contains all open ports for the given String (which is an IP address).
         */
-       System.out.println("Starting port sweep of all devices...");
+       System.out.println("Starting PRIORITY port sweep of all devices...");
        PriorityScanner[] priorityPortPool = new PriorityScanner[hits.length()];
        WorkerScanner[] workerPortPool = new WorkerScanner[hits.length()];
        Thread[] priorityThreads = new Thread[hits.length()];
@@ -169,9 +169,6 @@ public class main {
            priorityPortPool[i] = new PriorityScanner(priorityPortMap, tmp.val);
            priorityThreads[i] = new Thread(priorityPortPool[i], "PriorityScanner " + i);
            priorityThreads[i].start();
-           workerPortPool[i] = new WorkerScanner(workerPortMap, tmp.val);
-           workerThreads[i] = new Thread(workerPortPool[i], "WorkerScanner " + i);
-           workerThreads[i].start();
            tmp = tmp.next;
            i++;
        }
@@ -186,7 +183,27 @@ public class main {
            }
        }
        end = clock.millis();// Time reports.
-       System.out.println("We swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+       System.out.println("We priority swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+
+
+       // Now start the worker buddies.
+        System.out.println("Starting WORKING port scanner.");
+        start = clock.millis();
+
+       i = 0;
+       tmp = hits.head.next;
+       while (tmp != null){
+           /*
+           Instantiate the pool of scanners, and start them.
+            */
+            workerPortPool[i] = new WorkerScanner(workerPortMap, tmp.val);
+            workerThreads[i] = new Thread(workerPortPool[i], "WorkerScanner " + i);
+            workerThreads[i].start();
+            tmp = tmp.next;
+            i++;
+        }
+        end = clock.millis();// Time reports.
+        System.out.println("Our WORKERS swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
 
        // portIP is a dictionary where each key is a string representing the IP address and each value is a LinkedList representing all accessible Ports.
 
