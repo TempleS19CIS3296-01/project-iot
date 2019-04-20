@@ -38,7 +38,7 @@ public class PriorityScanner implements Runnable{
     }
 
     //method to check is socket creates a successful connection
-    public boolean successfullSocketConn(URL url) throws IOException {
+    public boolean successfulSocketConn(URL url) throws IOException {
         HttpURLConnection socketConn = (HttpURLConnection)url.openConnection();
         if (socketConn.getResponseCode() == 200){
             return true;
@@ -76,7 +76,7 @@ public class PriorityScanner implements Runnable{
 
                 //do matts curl here
                 URL socketURL = new URL("http://" + IP + ":" + port.val + "/setup/eureka_info");
-                if (successfullSocketConn(socketURL) == true){
+                if (successfulSocketConn(socketURL) == true){
                     System.out.println("A successful socket connection was established at: " + socketURL);
                     System.out.println("*****************************************************************");
                     System.out.println(jsonConverter(socketURL));
