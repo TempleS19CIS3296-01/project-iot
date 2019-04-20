@@ -1,7 +1,11 @@
 
-import java.net.Socket;
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.util.HashMap;
+
+import com.google.gson.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 
 public class PriorityScanner implements Runnable{
@@ -15,7 +19,33 @@ public class PriorityScanner implements Runnable{
         IP = ip;
         targetPorts = getTargetPorts();//generate list of "high risk" ports
     }
-    
+
+    //function takes in a url and returns a string of the formatted json data
+    public String jsonConverter(URL url) {
+        String json = "";
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
+            for (String jsonData; (jsonData = reader.readLine()) != null;) {
+
+                JsonElement jsonElement = new JsonParser().parse(jsonData);
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                json = gson.toJson(jsonElement);
+                return json;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    //method to check is socket creates a successful connection
+    public boolean successfullSocketConn(URL url) throws IOException {
+        HttpURLConnection socketConn = (HttpURLConnection)url.openConnection();
+        if (socketConn.getResponseCode() == 200){
+            return true;
+        }
+        return false;
+    }
+
     public void run(){
         // Iterate over all ports.
         LinkedListInt.Node port = targetPorts.head.next;
@@ -43,6 +73,16 @@ public class PriorityScanner implements Runnable{
                     }
                 }
                 System.out.println("IP: "+ IP+ " port found at : " + port.val);
+
+                //do matts curl here
+                URL socketURL = new URL("http://" + IP + ":" + port.val + "/setup/eureka_info");
+                if (successfullSocketConn(socketURL) == true){
+                    System.out.println("A successful socket connection was established at: " + socketURL);
+                    System.out.println("*****************************************************************");
+                    System.out.println(jsonConverter(socketURL));
+                    System.out.println("*****************************************************************");
+                }
+
             } catch (Exception ex) {
             }
 
@@ -86,6 +126,7 @@ public class PriorityScanner implements Runnable{
         targetPorts.add(636);
         targetPorts.add(989);
         targetPorts.add(990);
+        targetPorts.add(8008); //google home
 
         return targetPorts;
     }
