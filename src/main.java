@@ -99,7 +99,7 @@ public class main {
                for (int i = 0; i < NUM_WORKERS; i++){
                    pool[i] = new IPScan(hits, IPMax[i]);
                    threads[i] = new Thread(pool[i], "Worker " + i);
-                   threads[i].start();// Start all threads.
+                   threads[i].start(); // Start all threads.
                }
                //needs to wait till all threads are done
                break;

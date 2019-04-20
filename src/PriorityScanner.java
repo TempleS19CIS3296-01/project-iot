@@ -76,7 +76,7 @@ public class PriorityScanner implements Runnable{
 
                 //do matts curl here
                 URL socketURL = new URL("http://" + IP + ":" + port.val + "/setup/eureka_info");
-                if (successfulSocketConn(socketURL) == true){
+                if (successfulSocketConn(socketURL)){
                     System.out.println("A successful socket connection was established at: " + socketURL);
                     System.out.println("*****************************************************************");
                     System.out.println(jsonConverter(socketURL));
