@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class cURLthread implements Runnable {
     private int port;
     private String IP;
@@ -16,7 +19,6 @@ public class cURLthread implements Runnable {
         this.port = port;
         this.IP = IP;
     }
-
 
 
     @Override
@@ -30,28 +32,29 @@ public class cURLthread implements Runnable {
         }
         try {
             if (successfulSocketConn(socketURL)){
+                GoogleHome g = new GoogleHome();
                 System.out.println("A successful socket connection was established at: " + socketURL);
                 System.out.println("*****************************************************************");
                 System.out.println(jsonConverter(socketURL));
                 System.out.println("*****************************************************************");
+                try {
+                    String localFirmVersion = jsonParser(jsonConverter(socketURL), "cast_build_revision");
+                    System.out.println("The most up to date firmware version to be on is " + g.getRecentFirmWareVersion() + " and you are on version " + localFirmVersion + ".");
+                    if (localFirmVersion.equals(g.getRecentFirmWareVersion())){
+                        System.out.println("Looks good to me!");
+                    } else {
+                        System.out.println("Looks like it's time for an update.");
+                    }
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-    //method to check is socket creates a successful connection
-    public boolean successfulSocketConn(URL url) throws IOException {
-        HttpURLConnection socketConn = (HttpURLConnection)url.openConnection();
-        try {
-            if (socketConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                return true;
-            }
-        } catch (UnknownHostException | SocketException expected){// This will happen.
-        }
-        return false;
-    }
 
     //function takes in a url and returns a string of the formatted json data
     public String jsonConverter(URL url) {
@@ -68,5 +71,25 @@ public class cURLthread implements Runnable {
             e.printStackTrace();
         }
         return json;
+    }
+
+    //function to parse json data
+    public String jsonParser(String fullJSON, String getParam) throws JSONException {
+        String extractedJson = fullJSON;
+        JSONObject obj = new JSONObject(extractedJson);
+        extractedJson = (String) obj.get(getParam);
+        return extractedJson;
+    }
+
+    //method to check is socket creates a successful connection
+    public boolean successfulSocketConn(URL url) throws IOException {
+        HttpURLConnection socketConn = (HttpURLConnection)url.openConnection();
+        try {
+            if (socketConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                return true;
+            }
+        } catch (UnknownHostException | SocketException expected){// This will happen.
+        }
+        return false;
     }
 }
