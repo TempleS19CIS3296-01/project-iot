@@ -93,7 +93,8 @@ public class main {
        Each IP address we found is given a thread.
        We make 2 hashmaps, which map String keys to a linkedlist of integers. The linkedlist contains all open ports for the given String (which is an IP address).
         */
-       System.out.println("Starting PRIORITY port sweep of all devices...");
+       System.out.println("\nStarting PRIORITY port sweep of all devices...");
+       System.out.println("****************************************************");
        PriorityScanner[] priorityPortPool = new PriorityScanner[hits.length()];
        WorkerScanner[] workerPortPool = new WorkerScanner[hits.length()];
        Thread[] priorityThreads = new Thread[hits.length()];
@@ -123,7 +124,8 @@ public class main {
 
 
        // Now start the worker buddies.
-      System.out.println("Starting WORKING port scanner.");
+      System.out.println("\nStarting NON-PRIORITY port sweep of all devices...");
+      System.out.println("****************************************************");
       start = clock.millis();
 
       i = 0;
@@ -139,16 +141,15 @@ public class main {
             i++;
         }
 
-       System.out.println("Thank you for your business, your SHIT has been scanned!");
-       System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
+       //System.out.println("Thank you for your business, your SHIT has been scanned!");
+       //System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
        joinThreads(workerThreads);
        end = clock.millis();// Time reports.
-       System.out.println("Our WORKERS swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+       System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
+               (end - start) / 1000 + " seconds.");
 
 
     }
-
-
 
     public static String getSubnet(){
         InetAddress localHost = null;
