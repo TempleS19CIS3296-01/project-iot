@@ -138,13 +138,14 @@ public class main {
             tmp = tmp.next;
             i++;
         }
-       end = clock.millis();// Time reports.
-       System.out.println("Our WORKERS swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
-
 
        System.out.println("Thank you for your business, your SHIT has been scanned!");
        System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
        joinThreads(workerThreads);
+       end = clock.millis();// Time reports.
+       System.out.println("Our WORKERS swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+
+
     }
 
 
