@@ -3,12 +3,12 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
-public class googleHome {
+public class GoogleHome {
     // This is where we store the current version of firmware for the google home.
     private String recentFirmWareVersion;
     private boolean upToDate;
 
-    public googleHome(){
+    public GoogleHome(){
          recentFirmWareVersion = getFirmWareVersion();
     }
     // Function to scrape the web for the most up to date firmware version for google home.
