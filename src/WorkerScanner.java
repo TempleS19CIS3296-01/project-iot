@@ -37,7 +37,7 @@ public class WorkerScanner implements Runnable{
                 }
                 // TODO: We don't want worker threads printing.
                 System.out.println("IP: "+ IP+ " port found at : " + port);
-            } catch (Exception ex) {
+            } catch (Exception ex) {// If we miss a port, don't worry about it. We're in the background, anyways.
             }
 
         }
