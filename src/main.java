@@ -7,6 +7,7 @@ help for updating if devices need to be. All will be printed in audit.
 
 import java.net.InetAddress;
 import java.io.*;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.time.Clock;
@@ -16,60 +17,13 @@ public class main {
     static int devicesFound = 0;
     static final int NUM_WORKERS = 255;// How many threads we have going.
 
-
-    // ASCII COLORS
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-
-
-    /**
-     * Populates an array of IP addresses
-     * @param ip - base IP address ex)192.168.1, 10.0.0
-     * @param min - starting IP address ex) 0, 1
-     * @param max - ending IP address ex)256, 20
-     * @return IPs - string of IP addresses
-     */
-    public static String[][] populateIPRange(String ip, int min, int max){
-        // The ceiling of the quotient makes sure we don't miss any IP addresses.
-        // Any additional array elements created by this will be set to null, and
-        // our sendIPRequest function handles null strings.
-        String[][] IPs = new String[NUM_WORKERS][(int)Math.ceil(1.0*max/NUM_WORKERS)];
-        int index1 = 0;
-        int index2 = 0;
-        String s;
-        while(index2 < Math.ceil(1.0*max/NUM_WORKERS)){
-            // If we have already populated 255 ip addresses, then add null.
-            if (index2 * NUM_WORKERS + index1 >= max){
-                s = null;
-            } else {
-                s = ip + "." + min;
-            }
-            IPs[index1][index2] = s;
-            min++;
-            index1++;
-            if (index1 >= NUM_WORKERS){
-                index1 = 0;
-                index2++;
-            }
-        }
-        return IPs;
-    }
-
-
-
     // Driver code
     public static void main(String[] args) throws IOException {
        Scanner scan = new Scanner(System.in);
        printOpening();
        System.out.println("Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
-       int choice = scan.nextInt();// TODO: is this really necessary?
-
+       int choice = scan.nextInt();
         /*
         Initialize the pool of scanners as well as the pool of threads.
         We have a matrix of IP addresses, which will divide up enough IP addresses for each thread.
@@ -81,7 +35,6 @@ public class main {
        LinkedListString hits = new LinkedListString();
        Clock clock = Clock.systemDefaultZone();
        long start = clock.millis();
-
        /*
        We get the user's IP address, then populate our IP matrix with all possible IP addresses within the range 0-255.
        Loop through the pool of Scanners, initialize them, and start the thread to scan over all IP addresses given to that thread.
@@ -89,10 +42,7 @@ public class main {
         */
        switch(choice) {
            case 1:
-               InetAddress localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
-               System.out.println("Current IP address is : " + localHost.getHostAddress());
-               String subnetString = localHost.getHostAddress(); //get the local ip as a string
-               String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
+               String subnet = getSubnet();
                System.out.println("Current IP subnet to scan is : " + subnet);
                IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
                // EVERYONE GET READY TO START YOUR ENGINES.
@@ -101,7 +51,6 @@ public class main {
                    threads[i] = new Thread(pool[i], "Worker " + i);
                    threads[i].start(); // Start all threads.
                }
-               //needs to wait till all threads are done
                break;
            case 2:
                System.out.println("Enter your desired subnet to scan: ");
@@ -115,7 +64,6 @@ public class main {
                    threads[i] = new Thread(pool[i], "Worker " + i);
                    threads[i].start();// But they do.
                }
-               //needs to wait till all threads are done
                break;
            default:
                System.out.println("Error: value entered was not in range.");
@@ -127,14 +75,8 @@ public class main {
        Print a report per worker letting us know how many devices the worker found.
        If a worker does not find any devices, don't bother printing it out.
         */
+       joinThreads(threads);
        for (int i = 0; i < NUM_WORKERS; i++) {
-           try {
-               threads[i].join();
-
-           } catch (InterruptedException e) {
-               System.out.println("Interrupted during join");
-               continue;
-           }
            if (pool[i].getDevicesFound() == 0) {
                continue;
            }
@@ -175,24 +117,18 @@ public class main {
         /*
         We need to wait for the priority threads to finish so that we can report on the priority ports we scanned.
          */
-       for (i = 0; i < hits.length(); i++){
-           try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
-               priorityThreads[i].join();
-           } catch (InterruptedException e){
-               System.out.println("Interrupted during join");
-           }
-       }
-       end = clock.millis();// Time reports.
-       System.out.println("We priority swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+      joinThreads(priorityThreads);
+      end = clock.millis();// Time reports.
+      System.out.println("We priority swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
 
 
        // Now start the worker buddies.
-        System.out.println("Starting WORKING port scanner.");
-        start = clock.millis();
+      System.out.println("Starting WORKING port scanner.");
+      start = clock.millis();
 
-       i = 0;
-       tmp = hits.head.next;
-       while (tmp != null){
+      i = 0;
+      tmp = hits.head.next;
+      while (tmp != null){
            /*
            Instantiate the pool of scanners, and start them.
             */
@@ -202,33 +138,85 @@ public class main {
             tmp = tmp.next;
             i++;
         }
-        end = clock.millis();// Time reports.
-        System.out.println("Our WORKERS swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
+       end = clock.millis();// Time reports.
+       System.out.println("Our WORKERS swept through " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
 
-       // portIP is a dictionary where each key is a string representing the IP address and each value is a LinkedList representing all accessible Ports.
-
-       // To get the set of all keys, use portIP.keySet().
-       for (Object key : priorityPortMap.keySet()){
-           // To access a certain element, use get.
-           LinkedListInt element = (LinkedListInt)priorityPortMap.get((String)key);
-           // Example of how to get ip-port pair.
-           String ipAddress = (String) key;
-           int portNumber = element.remove();
-       }
 
        System.out.println("Thank you for your business, your SHIT has been scanned!");
        System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
-        // TODO: Figure out where to put this?!?
-        for (i = 0; i < hits.length(); i++){
+       joinThreads(workerThreads);
+    }
+
+
+
+    public static String getSubnet(){
+        InetAddress localHost = null;
+        try {
+            localHost = InetAddress.getLocalHost(); //get the ip address of the machine running the scan
+        } catch (UnknownHostException e){
+            e.printStackTrace();
+        }
+        System.out.println("Current IP address is : " + localHost.getHostAddress());
+        String subnetString = localHost.getHostAddress(); //get the local ip as a string
+        String subnet = subnetString.substring(0, subnetString.lastIndexOf("."));//get the subnet
+        return subnet;
+    }
+
+    // Function to join all threads within an array of threads.
+    public static void joinThreads(Thread[] threads){
+        for (int i = 0; i < threads.length; i++){
             try {// Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
-                workerThreads[i].join();
+                threads[i].join();
             } catch (InterruptedException e){
                 System.out.println("Interrupted during join");
             }
         }
     }
 
+    /**
+     * Populates an array of IP addresses
+     * @param ip - base IP address ex)192.168.1, 10.0.0
+     * @param min - starting IP address ex) 0, 1
+     * @param max - ending IP address ex)256, 20
+     * @return IPs - string of IP addresses
+     */
+    public static String[][] populateIPRange(String ip, int min, int max){
+        // The ceiling of the quotient makes sure we don't miss any IP addresses.
+        // Any additional array elements created by this will be set to null, and
+        // our sendIPRequest function handles null strings.
+        String[][] IPs = new String[NUM_WORKERS][(int)Math.ceil(1.0*max/NUM_WORKERS)];
+        int index1 = 0;
+        int index2 = 0;
+        String s;
+        while(index2 < Math.ceil(1.0*max/NUM_WORKERS)){
+            // If we have already populated 255 ip addresses, then add null.
+            if (index2 * NUM_WORKERS + index1 >= max){
+                s = null;
+            } else {
+                s = ip + "." + min;
+            }
+            IPs[index1][index2] = s;
+            min++;
+            index1++;
+            if (index1 >= NUM_WORKERS){
+                index1 = 0;
+                index2++;
+            }
+        }
+        return IPs;
+    }
+
+
     public static void printOpening(){
+        // ASCII COLORS
+        final String ANSI_RESET = "\u001B[0m";
+        final String ANSI_RED = "\u001B[31m";
+        final String ANSI_GREEN = "\u001B[32m";
+        final String ANSI_YELLOW = "\u001B[33m";
+        final String ANSI_BLUE = "\u001B[34m";
+        final String ANSI_PURPLE = "\u001B[35m";
+        final String ANSI_CYAN = "\u001B[36m";
+
         System.out.println();
         System.out.println(ANSI_RED+" $$$$$$\\"+ANSI_YELLOW+"  $$\\   $$\\"+ANSI_GREEN+" $$$$$$\\"+ANSI_CYAN+" $$$$$$$$\\         "+ANSI_BLUE+" $$$$$$\\  "+ANSI_PURPLE+" $$$$$$\\"+ANSI_RED+"   $$$$$$\\ "+ANSI_YELLOW+" $$\\   $$\\"+ANSI_GREEN+" $$\\   $$\\"+ANSI_CYAN+" $$$$$$$$\\ "+ANSI_BLUE+"$$$$$$$\\");
         System.out.println(ANSI_RED+"$$  __$$\\"+ANSI_YELLOW+" $$ |  $$ |"+ANSI_GREEN+"\\_$$  _|"+ANSI_CYAN+"\\__$$  __|       "+ANSI_BLUE+" $$  __$$\\ "+ANSI_PURPLE+"$$  __$$\\"+ANSI_RED+" $$  __$$\\"+ANSI_YELLOW+" $$$\\  $$ |"+ANSI_GREEN+"$$$\\  $$ |"+ANSI_CYAN+"$$  _____|"+ANSI_BLUE+"$$  __$$\\");
