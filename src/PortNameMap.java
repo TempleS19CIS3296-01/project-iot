@@ -8,6 +8,9 @@ public class PortNameMap {
         initializeMap();
     }
 
+    public HashMap getMap() {
+        return map;
+    }
 
     private void initializeMap(){
         map = new HashMap<>();
