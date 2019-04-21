@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class WorkerScanner implements Runnable{
     private HashMap<String, LinkedListInt> portMap;
     private String IP;
+    private HashMap namedPorts = new PortNameMap().getMap();
 
     public WorkerScanner(HashMap portMap, String ip){
         this.portMap = portMap;
@@ -36,7 +37,11 @@ public class WorkerScanner implements Runnable{
                     }
                 }
                 // TODO: We don't want worker threads printing.
-                System.out.println("IP: "+ IP+ " port found at : " + port);
+                if (namedPorts.containsKey(port)){
+                    System.out.println("IP: " + IP + ", " + namedPorts.get(port) + " port found at : " + port);
+                } else {
+                    System.out.println("IP: " + IP + " port found at : " + port);
+                }
             } catch (Exception ex) {// If we miss a port, don't worry about it. We're in the background, anyways.
             }
 
