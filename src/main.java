@@ -254,19 +254,19 @@ public class main {
 
     // QA stuff for my pal Pat
     public static void validateChoice(Object choice){
-       System.out.println("Pat, please validate input.");
+       System.out.println("Pat, please validate input. I was hardcoded on line 257.");
        System.exit(9);
     }
 
     // More stuff for Pat
     public static void validateSubnet(String sub){
-        System.out.println("Pat, please validate subnet.");
+        System.out.println("Pat, please validate subnet. I was hardcoded on line 263");
         System.exit(9);
     }
 
     // Hello there Patrick.
     public static void validateMaxRange(Object maxRange){
-        System.out.println("Pat, you know what to do.");
+        System.out.println("Pat, you know what to do. I was hardcoded on line 269.");
         System.exit(9);
     }
 
