@@ -16,6 +16,10 @@ public class main {
 
     static int devicesFound = 0;
     static final int NUM_WORKERS = 255;// How many threads we have going.
+    static String[][] IPMax;
+    static IPScan[] pool = new IPScan[NUM_WORKERS];
+    static Thread[] threads = new Thread[NUM_WORKERS];
+    static LinkedListString hits = new LinkedListString();
 
     // Driver code
     public static void main(String[] args) throws IOException {
@@ -23,16 +27,17 @@ public class main {
        printOpening();
        System.out.println("Would you like to run a quick scan (1) or would you like to scan a certain " +
                 "range (2)? Enter 1 or 2.");
-       int choice = scan.nextInt();
+       Object choice = scan.next();
+       // PATRICK
+       validateChoice(choice);
         /*
         Initialize the pool of scanners as well as the pool of threads.
         We have a matrix of IP addresses, which will divide up enough IP addresses for each thread.
         Then, we also make a linked list to keep track of all IP addresses which contain a device.
          */
-       IPScan[] pool = new IPScan[NUM_WORKERS];
-       Thread[] threads = new Thread[NUM_WORKERS];
-       String[][] IPMax;
-       LinkedListString hits = new LinkedListString();
+
+
+
        Clock clock = Clock.systemDefaultZone();
        long start = clock.millis();
        /*
@@ -40,35 +45,10 @@ public class main {
        Loop through the pool of Scanners, initialize them, and start the thread to scan over all IP addresses given to that thread.
        This will also extend to the linked list as soon as we find an IP address that contains a device.
         */
-       switch(choice) {
-           case 1:
-               String subnet = getSubnet();
-               System.out.println("Current IP subnet to scan is : " + subnet);
-               IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
-               // EVERYONE GET READY TO START YOUR ENGINES.
-               for (int i = 0; i < NUM_WORKERS; i++){
-                   pool[i] = new IPScan(hits, IPMax[i]);
-                   threads[i] = new Thread(pool[i], "Worker " + i);
-                   threads[i].start(); // Start all threads.
-               }
-               break;
-           case 2:
-               System.out.println("Enter your desired subnet to scan: ");
-               String sub = scan.next();
-               System.out.println("Enter your max range: ");
-               int maxRange = scan.nextInt();
-               IPMax = populateIPRange(sub, 1, maxRange);
-               // I don't want these engines to start.
-               for (int i = 0; i < NUM_WORKERS; i++){
-                   pool[i] = new IPScan(hits, IPMax[i]);
-                   threads[i] = new Thread(pool[i], "Worker " + i);
-                   threads[i].start();// But they do.
-               }
-               break;
-           default:
-               System.out.println("Error: value entered was not in range.");
-               System.exit(0);
-       }
+        /**
+         * PATRICK: Please take off the casting here as long as input is validated.
+         */
+        chooseOption((int)choice, scan);
 
        /*
        Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
@@ -147,8 +127,49 @@ public class main {
        end = clock.millis();// Time reports.
        System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
                (end - start) / 1000 + " seconds.");
+    }// end of main.
 
+    public static void chooseOption(int choice, Scanner scan){
+        switch(choice) {
+            case 1:
+                chooseOptionOne(scan);
+                break;
+            case 2:
+                chooseOptionTwo(scan);
+                break;
+            default:
+                System.out.println("Error: value entered was not in range.");
+                System.exit(0);
+        }
+    }
 
+    public static void chooseOptionOne(Scanner scan){
+        String subnet = getSubnet();
+        System.out.println("Current IP subnet to scan is : " + subnet);
+        IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
+        // EVERYONE GET READY TO START YOUR ENGINES.
+        for (int i = 0; i < NUM_WORKERS; i++){
+            pool[i] = new IPScan(hits, IPMax[i]);
+            threads[i] = new Thread(pool[i], "Worker " + i);
+            threads[i].start(); // Start all threads.
+        }
+    }
+
+    public static void chooseOptionTwo(Scanner scan){
+        System.out.println("Enter your desired subnet to scan: ");
+        String sub = scan.next();
+        validateSubnet(sub);
+        System.out.println("Enter your max range: ");
+        Object maxRange = scan.next();
+        validateMaxRange(maxRange);
+        // Pat, please take off casting to int when you validate.
+        IPMax = populateIPRange(sub, 1, (int)maxRange);
+        // I don't want these engines to start.
+        for (int i = 0; i < NUM_WORKERS; i++){
+            pool[i] = new IPScan(hits, IPMax[i]);
+            threads[i] = new Thread(pool[i], "Worker " + i);
+            threads[i].start();// But they do.
+        }
     }
 
     public static String getSubnet(){
@@ -230,4 +251,23 @@ public class main {
         System.out.println(ANSI_RED+" \\______/ "+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\______|   "+ANSI_CYAN+"\\__|           "+ANSI_BLUE+" \\______/  "+ANSI_PURPLE+"\\______/ "+ANSI_RED+"\\__|  \\__|"+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\__|  \\__|"+ANSI_CYAN+"\\________|"+ANSI_BLUE+"\\__|  \\__|"+ANSI_RESET);
         System.out.println();
     }
+
+    // QA stuff for my pal Pat
+    public static void validateChoice(Object choice){
+       System.out.println("Pat, please validate input.");
+       System.exit(9);
+    }
+
+    // More stuff for Pat
+    public static void validateSubnet(String sub){
+        System.out.println("Pat, please validate subnet.");
+        System.exit(9);
+    }
+
+    // Hello there Patrick.
+    public static void validateMaxRange(Object maxRange){
+        System.out.println("Pat, you know what to do.");
+        System.exit(9);
+    }
+
 }
