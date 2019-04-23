@@ -220,7 +220,7 @@ public class main {
             return;
         }
         try {
-            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")));
+            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")).instant());
         } catch (IOException uhOh){
             System.out.println("Trouble writing to file. Patty Ice, should we do something about this?");
         }
