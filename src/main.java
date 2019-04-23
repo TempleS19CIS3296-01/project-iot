@@ -228,10 +228,10 @@ public class main {
 
         for (String key : sortedKeys){
             try {
-                file.write("IP: " + key + " Status:\nOpen Ports Found:\n");
+                file.write("\nIP: " + key + " Status:\n\tOpen Ports Found:\n");
                 Queue<String> portReport = data.get(key);
                 for (String port : portReport){
-                    file.write(port + "\n");
+                    file.write("\t\t" + port + "\n");
                 }
             } catch (IOException uhOh){
                 System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
