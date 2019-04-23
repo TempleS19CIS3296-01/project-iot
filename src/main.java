@@ -8,6 +8,9 @@ help for updating if devices need to be. All will be printed in audit.
 import java.net.InetAddress;
 import java.io.*;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.regex.*;
 import java.time.ZoneId;
 import java.util.*;
 import java.time.Clock;
@@ -16,60 +19,23 @@ public class main {
 
     static int devicesFound = 0;
     static final int NUM_WORKERS = 255;// How many threads we have going.
+    static String[][] IPMax;
+    static IPScan[] pool = new IPScan[NUM_WORKERS];
+    static Thread[] threads = new Thread[NUM_WORKERS];
+    static LinkedListString hits = new LinkedListString();
     static HashMap<String, Queue> data = new HashMap<>();
 
     // Driver code
     public static void main(String[] args) throws IOException {
-       Scanner scan = new Scanner(System.in);
        printOpening();
-       System.out.println("Would you like to run a quick scan (1) or would you like to scan a certain " +
-                "range (2)? Enter 1 or 2.");
-       int choice = scan.nextInt();
-        /*
-        Initialize the pool of scanners as well as the pool of threads.
-        We have a matrix of IP addresses, which will divide up enough IP addresses for each thread.
-        Then, we also make a linked list to keep track of all IP addresses which contain a device.
-         */
-       IPScan[] pool = new IPScan[NUM_WORKERS];
-       Thread[] threads = new Thread[NUM_WORKERS];
-       String[][] IPMax;
-       LinkedListString hits = new LinkedListString();
+       Scanner scan = new Scanner(System.in);
+       int choice = getUserChoice(scan);//prompts and validates user input:scan method choice
+
+       //start timing procedure
        Clock clock = Clock.systemDefaultZone();
        long start = clock.millis();
-       /*
-       We get the user's IP address, then populate our IP matrix with all possible IP addresses within the range 0-255.
-       Loop through the pool of Scanners, initialize them, and start the thread to scan over all IP addresses given to that thread.
-       This will also extend to the linked list as soon as we find an IP address that contains a device.
-        */
-       switch(choice) {
-           case 1:
-               String subnet = getSubnet();
-               System.out.println("Current IP subnet to scan is : " + subnet);
-               IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
-               // EVERYONE GET READY TO START YOUR ENGINES.
-               for (int i = 0; i < NUM_WORKERS; i++){
-                   pool[i] = new IPScan(hits, IPMax[i]);
-                   threads[i] = new Thread(pool[i], "Worker " + i);
-                   threads[i].start(); // Start all threads.
-               }
-               break;
-           case 2:
-               System.out.println("Enter your desired subnet to scan: ");
-               String sub = scan.next();
-               System.out.println("Enter your max range: ");
-               int maxRange = scan.nextInt();
-               IPMax = populateIPRange(sub, 1, maxRange);
-               // I don't want these engines to start.
-               for (int i = 0; i < NUM_WORKERS; i++){
-                   pool[i] = new IPScan(hits, IPMax[i]);
-                   threads[i] = new Thread(pool[i], "Worker " + i);
-                   threads[i].start();// But they do.
-               }
-               break;
-           default:
-               System.out.println("Error: value entered was not in range.");
-               System.exit(0);
-       }
+       
+       chooseOption(choice, scan);
 
        /*
        Join all threads (i.e. wait for them to finish) and then find how many devices we connected to.
@@ -83,6 +49,7 @@ public class main {
            }
            System.out.println("Worker " + i + " found " + pool[i].getDevicesFound() + " devices.");
        }
+
        // Timing report.
        long end = clock.millis();
        System.out.println("We found " + hits.length() + " devices in " + (end - start) / 1000 + " seconds.");
@@ -147,8 +114,48 @@ public class main {
        end = clock.millis();// Time reports.
        System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
                (end - start) / 1000 + " seconds.");
+    }// end of main.
+
+    public static void chooseOption(int choice, Scanner scan){
+        switch(choice) {
+            case 1:
+                chooseOptionOne(scan);
+                break;
+            case 2:
+                chooseOptionTwo(scan);
+                break;
+            default:
+                System.out.println("Error: value entered was not in range.");
+                System.exit(0);
+        }
+    }
+
+    public static void chooseOptionOne(Scanner scan){
+        String subnet = getSubnet();
+        System.out.println("Current IP subnet to scan is : " + subnet);
+        IPMax = populateIPRange(subnet, 1, 255);  //edit subnet here
+        // EVERYONE GET READY TO START YOUR ENGINES.
+        for (int i = 0; i < NUM_WORKERS; i++){
+            pool[i] = new IPScan(hits, IPMax[i]);
+            threads[i] = new Thread(pool[i], "Worker " + i);
+            threads[i].start(); // Start all threads.
+        }
+    }
+
+    public static void chooseOptionTwo(Scanner scan){
+        String sub = getUserSubnet(scan);//scans/validates user input for ipv4 address subnet (xxx.xxx.xxx)
+        int maxRange = getUserMaxRange(scan);//scans/validates user input for maximum range of devices on subnet to s
+
+        IPMax = populateIPRange(sub, 1, maxRange);
+        // I don't want these engines to start.
+        for (int i = 0; i < NUM_WORKERS; i++){
+            pool[i] = new IPScan(hits, IPMax[i]);
+            threads[i] = new Thread(pool[i], "Worker " + i);
+            threads[i].start();// But they do.
+        }
 
        outputLog(clock);
+
     }
 
     public static String getSubnet(){
@@ -271,4 +278,70 @@ public class main {
         System.out.println();
     }
 
+
+    /*
+     * @param scan: Scanner object instantiated in main
+     * @return choice: Integer value (validated to 1 or 2) of user's choice of scan-method
+     * 
+     * Prompts user for input, explaining choices. Validates first that the value
+     * entered is a number, then if that number is in range.
+     */
+    public static int getUserChoice(Scanner scan){
+
+      int choice;
+
+      do{
+        System.out.println("Would you like to run a quick scan (1) or would you like to scan a certain " +
+          "range (2)? Enter 1 or 2.");
+        while(!scan.hasNextInt()){
+          System.out.println("Please enter a number.");
+          scan.next();
+        }
+        choice = scan.nextInt();
+      } while(choice != 1 && choice != 2);
+      
+      return choice;
+    }
+
+    /**
+     * @param scan: Scanner object instantiated in main
+     * @return sub: string of IP subnet (validated to appropriate IP ranges)
+     * of user's target subnet.
+     * 
+     * Uses a regex pattern matcher to validate that the address entered
+     */
+    public static String getUserSubnet(Scanner scan){
+      String sub;
+
+      final String ipv4Regex = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+      "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+      final Pattern ipv4Pattern = Pattern.compile(ipv4Regex);
+
+      do{
+        System.out.println("Enter your desired IP subnet to scan: [ex. 192.168.1]");
+        sub = scan.nextLine();
+      } while(!ipv4Pattern.matcher(sub).matches());
+      
+      return sub;
+    }
+
+    /**
+     * 
+     * @param scan: Scanner object instantiated in main
+     * @return maxRange: maximum address to scan within target subnet (xxx.xxx.xxx.[1-maxRange])
+     */
+    public static int getUserMaxRange(Scanner scan){
+      int maxRange;
+
+      do{
+        System.out.println("Please enter the maximum range of addresses to scan. [ex. 1 - 255]");
+        while(!scan.hasNextInt()){
+          System.out.println("Please enter a number.");
+          scan.next();
+        }
+        maxRange = scan.nextInt();
+      } while(maxRange <= 0 || maxRange >= 256);
+      
+      return maxRange;
+    }
 }
