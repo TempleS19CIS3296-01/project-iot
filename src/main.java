@@ -114,6 +114,7 @@ public class main {
        end = clock.millis();// Time reports.
        System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
                (end - start) / 1000 + " seconds.");
+       outputLog(clock);
     }// end of main.
 
     public static void chooseOption(int choice, Scanner scan){
@@ -154,7 +155,6 @@ public class main {
             threads[i].start();// But they do.
         }
 
-       outputLog(clock);
 
     }
 
