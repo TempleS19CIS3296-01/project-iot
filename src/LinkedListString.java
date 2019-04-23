@@ -58,6 +58,16 @@ class LinkedListString {
         return null;
     }
 
+    Node get(String find){
+        Node ret = head.next;
+        while (ret != null){
+            if (ret.val.contains(find)){// Substring is good enough for this purpose.
+                return ret;
+            }
+            ret = ret.next;
+        }
+        return null;// We could also return ret because it would be null at this point but anyways.
+    }
 
     @Override
     public String toString(){
