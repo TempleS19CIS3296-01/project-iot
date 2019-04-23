@@ -188,6 +188,7 @@ public class PortNameMap {
         map.put(7648, "CU-SeeMe");
         map.put(7649, "CU-SeeMe");
         map.put(8000, "Internet Radio");
+        map.put(8008, "TCP/UDP");
         map.put(8080, "HTTP Proxy");
         map.put(8086, "Kaspersky AV");
         map.put(8087, "Kaspersky AV");
