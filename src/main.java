@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.*;
+import java.time.ZoneId;
+import java.util.*;
 import java.time.Clock;
 
 public class main {
@@ -21,9 +23,11 @@ public class main {
     static IPScan[] pool = new IPScan[NUM_WORKERS];
     static Thread[] threads = new Thread[NUM_WORKERS];
     static LinkedListString hits = new LinkedListString();
+    static HashMap<String, Queue> data = new HashMap<>();
 
     // Driver code
     public static void main(String[] args) throws IOException {
+       printOpening();
        Scanner scan = new Scanner(System.in);
        int choice = getUserChoice(scan);//prompts and validates user input:scan method choice
 
@@ -98,15 +102,14 @@ public class main {
            /*
            Instantiate the pool of scanners, and start them.
             */
-            workerPortPool[i] = new WorkerScanner(workerPortMap, tmp.val);
+            workerPortPool[i] = new WorkerScanner(data, workerPortMap, tmp.val);
             workerThreads[i] = new Thread(workerPortPool[i], "WorkerScanner " + i);
             workerThreads[i].start();
             tmp = tmp.next;
             i++;
         }
 
-       //System.out.println("Thank you for your business, your SHIT has been scanned!");
-       //System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
+
        joinThreads(workerThreads);
        end = clock.millis();// Time reports.
        System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
@@ -150,6 +153,9 @@ public class main {
             threads[i] = new Thread(pool[i], "Worker " + i);
             threads[i].start();// But they do.
         }
+
+       outputLog(clock);
+
     }
 
     public static String getSubnet(){
@@ -209,6 +215,46 @@ public class main {
         return IPs;
     }
 
+    public static void outputLog(Clock clock){
+        BufferedWriter file;
+        try {
+            file = new BufferedWriter(new FileWriter("report.log"));
+        } catch (IOException uhOh){
+            System.out.println("Log file could not be created. Patrick, should we do something about this?");
+            return;
+        }
+        try {
+            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")).instant() + "\n");
+            file.write(data.keySet().size() + " Devices found.");
+        } catch (IOException uhOh){
+            System.out.println("Trouble writing to file. Patty Ice, should we do something about this?");
+        }
+
+        Set<String> keys = data.keySet();
+        List<String> sortedKeys = new ArrayList<>(keys);
+        Collections.sort(sortedKeys);
+
+        for (String key : sortedKeys){
+            try {
+
+                Queue<String> portReport = data.get(key);
+                file.write("\nIP: " + key + " Status:\n  " + portReport.size() + " Open Ports Found:\n");
+                for (String port : portReport){
+                    file.write("    " + port + "\n");
+                }
+            } catch (IOException uhOh){
+                System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
+            }
+
+        }
+
+        try {
+            file.close();
+        } catch (IOException e){
+            System.out.println("We couldn't close the file. Patrick, help?");
+        }
+
+    }
 
     public static void printOpening(){
         // ASCII COLORS
@@ -231,6 +277,7 @@ public class main {
         System.out.println(ANSI_RED+" \\______/ "+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\______|   "+ANSI_CYAN+"\\__|           "+ANSI_BLUE+" \\______/  "+ANSI_PURPLE+"\\______/ "+ANSI_RED+"\\__|  \\__|"+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\__|  \\__|"+ANSI_CYAN+"\\________|"+ANSI_BLUE+"\\__|  \\__|"+ANSI_RESET);
         System.out.println();
     }
+
 
     /*
      * @param scan: Scanner object instantiated in main
@@ -297,5 +344,4 @@ public class main {
       
       return maxRange;
     }
-
 }

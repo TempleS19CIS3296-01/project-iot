@@ -177,9 +177,6 @@ public class PortNameMap {
         map.put(6679, "IRC over SSL");
         map.put(6697, "IRC over SSL");
         map.put(6699, "Napster");
-        for (int i = 6881; i < 7000; i++){
-            map.put(i, "BitTorrent");
-        }
         for (int i = 6891; i < 6902; i++) {
             map.put(i, "Windows Live");
         }
@@ -188,6 +185,7 @@ public class PortNameMap {
         map.put(7648, "CU-SeeMe");
         map.put(7649, "CU-SeeMe");
         map.put(8000, "Internet Radio");
+        map.put(8008, "TCP/UDP");
         map.put(8080, "HTTP Proxy");
         map.put(8086, "Kaspersky AV");
         map.put(8087, "Kaspersky AV");
