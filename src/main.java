@@ -15,7 +15,7 @@ import java.time.Clock;
 public class main {
 
     static int devicesFound = 0;
-    static final int NUM_WORKERS = 255;// How many threads we have going.
+    static final int NUM_WORKERS = 1;// How many threads we have going.
     static HashMap<String, Queue> data = new HashMap<>();
 
     // Driver code
@@ -220,11 +220,15 @@ public class main {
             return;
         }
         try {
-            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/NYC")));
+            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")));
         } catch (IOException uhOh){
             System.out.println("Trouble writing to file. Patty Ice, should we do something about this?");
         }
-
+        try {
+            file.close();
+        } catch (IOException e){
+            System.out.println("We couldn't close the file. Patrick, help?");
+        }
     }
 
     public static void printOpening(){
