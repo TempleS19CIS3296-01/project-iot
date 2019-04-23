@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.io.*;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Queue;
 import java.util.Scanner;
 import java.time.Clock;
 
@@ -16,6 +17,7 @@ public class main {
 
     static int devicesFound = 0;
     static final int NUM_WORKERS = 255;// How many threads we have going.
+    static HashMap<String, Queue> data = new HashMap<>();
 
     // Driver code
     public static void main(String[] args) throws IOException {
@@ -134,7 +136,7 @@ public class main {
            /*
            Instantiate the pool of scanners, and start them.
             */
-            workerPortPool[i] = new WorkerScanner(workerPortMap, tmp.val);
+            workerPortPool[i] = new WorkerScanner(data, workerPortMap, tmp.val);
             workerThreads[i] = new Thread(workerPortPool[i], "WorkerScanner " + i);
             workerThreads[i].start();
             tmp = tmp.next;
