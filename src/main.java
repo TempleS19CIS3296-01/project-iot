@@ -15,7 +15,7 @@ import java.time.Clock;
 public class main {
 
     static int devicesFound = 0;
-    static final int NUM_WORKERS = 1;// How many threads we have going.
+    static final int NUM_WORKERS = 255;// How many threads we have going.
     static HashMap<String, Queue> data = new HashMap<>();
 
     // Driver code
@@ -209,9 +209,6 @@ public class main {
     }
 
     public static void outputLog(Clock clock){
-        Set<String> keys = data.keySet();
-        List<String> list = new ArrayList<>(keys);
-        Collections.sort(list);
         BufferedWriter file;
         try {
             file = new BufferedWriter(new FileWriter("report.log"));
@@ -220,15 +217,34 @@ public class main {
             return;
         }
         try {
-            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")).instant());
+            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")).instant() + "\n");
         } catch (IOException uhOh){
             System.out.println("Trouble writing to file. Patty Ice, should we do something about this?");
         }
+
+        Set<String> keys = data.keySet();
+        List<String> sortedKeys = new ArrayList<>(keys);
+        Collections.sort(sortedKeys);
+
+        for (String key : sortedKeys){
+            try {
+                file.write("IP: " + key + " Status:\nOpen Ports Found:\n");
+                Queue<String> portReport = data.get(key);
+                for (String port : portReport){
+                    file.write(port + "\n");
+                }
+            } catch (IOException uhOh){
+                System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
+            }
+
+        }
+
         try {
             file.close();
         } catch (IOException e){
             System.out.println("We couldn't close the file. Patrick, help?");
         }
+
     }
 
     public static void printOpening(){
