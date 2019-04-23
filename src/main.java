@@ -320,7 +320,6 @@ public class main {
         System.out.println("Enter your desired IP subnet to scan: [ex. 192.168.1]");
         sub = scan.nextLine();
       } while(!ipv4Pattern.matcher(sub).matches());
-      scan.nextLine();
       return sub;
     }
 
