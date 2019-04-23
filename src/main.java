@@ -114,6 +114,7 @@ public class main {
        end = clock.millis();// Time reports.
        System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
                (end - start) / 1000 + " seconds.");
+       outputLog(clock);
     }// end of main.
 
     public static void chooseOption(int choice, Scanner scan){
@@ -153,8 +154,6 @@ public class main {
             threads[i] = new Thread(pool[i], "Worker " + i);
             threads[i].start();// But they do.
         }
-
-       outputLog(clock);
 
     }
 
@@ -299,7 +298,7 @@ public class main {
         }
         choice = scan.nextInt();
       } while(choice != 1 && choice != 2);
-      
+      scan.nextLine();
       return choice;
     }
 
@@ -321,7 +320,7 @@ public class main {
         System.out.println("Enter your desired IP subnet to scan: [ex. 192.168.1]");
         sub = scan.nextLine();
       } while(!ipv4Pattern.matcher(sub).matches());
-      
+      scan.nextLine();
       return sub;
     }
 
@@ -341,7 +340,7 @@ public class main {
         }
         maxRange = scan.nextInt();
       } while(maxRange <= 0 || maxRange >= 256);
-      
+
       return maxRange;
     }
 }
