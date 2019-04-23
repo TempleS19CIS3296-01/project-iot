@@ -8,9 +8,8 @@ help for updating if devices need to be. All will be printed in audit.
 import java.net.InetAddress;
 import java.io.*;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.Scanner;
+import java.time.ZoneId;
+import java.util.*;
 import java.time.Clock;
 
 public class main {
@@ -143,14 +142,13 @@ public class main {
             i++;
         }
 
-       //System.out.println("Thank you for your business, your SHIT has been scanned!");
-       //System.out.println("\n\n ----Impelmentation detail---- \nWe wouldn't really have the worker threads be printing out but I have them here now so that we can monitor progress.");
+
        joinThreads(workerThreads);
        end = clock.millis();// Time reports.
        System.out.println("We NON-PRIORITY swept through " + hits.length() + " devices in " +
                (end - start) / 1000 + " seconds.");
 
-
+       outputLog(clock);
     }
 
     public static String getSubnet(){
@@ -210,6 +208,24 @@ public class main {
         return IPs;
     }
 
+    public static void outputLog(Clock clock){
+        Set<String> keys = data.keySet();
+        List<String> list = new ArrayList<>(keys);
+        Collections.sort(list);
+        BufferedWriter file;
+        try {
+            file = new BufferedWriter(new FileWriter("report.log"));
+        } catch (IOException uhOh){
+            System.out.println("Log file could not be created. Patrick, should we do something about this?");
+            return;
+        }
+        try {
+            file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/NYC")));
+        } catch (IOException uhOh){
+            System.out.println("Trouble writing to file. Patty Ice, should we do something about this?");
+        }
+
+    }
 
     public static void printOpening(){
         // ASCII COLORS
@@ -232,4 +248,5 @@ public class main {
         System.out.println(ANSI_RED+" \\______/ "+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\______|   "+ANSI_CYAN+"\\__|           "+ANSI_BLUE+" \\______/  "+ANSI_PURPLE+"\\______/ "+ANSI_RED+"\\__|  \\__|"+ANSI_YELLOW+"\\__|  \\__|"+ANSI_GREEN+"\\__|  \\__|"+ANSI_CYAN+"\\________|"+ANSI_BLUE+"\\__|  \\__|"+ANSI_RESET);
         System.out.println();
     }
+
 }
