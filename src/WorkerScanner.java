@@ -36,9 +36,8 @@ public class WorkerScanner implements Runnable{
                 } else {
                     System.out.println("IP: " + IP + " Unnamed port found at : " + port);
                 }
-            } catch (Exception ex) {// If we miss a port, don't worry about it. We're in the background, anyways.
+            } catch (Exception expected) {// We expect we won't be able to hit many ports.
             }
-
         }
     }
     // TODO: Do we need synchronized? no other thread will have the same IP address.
