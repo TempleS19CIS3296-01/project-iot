@@ -218,6 +218,7 @@ public class main {
         }
         try {
             file.write("SHIT Scanner Report: " + clock.system(ZoneId.of("America/Puerto_Rico")).instant() + "\n");
+            file.write(data.keySet().size() + " Devices found.");
         } catch (IOException uhOh){
             System.out.println("Trouble writing to file. Patty Ice, should we do something about this?");
         }
@@ -228,10 +229,11 @@ public class main {
 
         for (String key : sortedKeys){
             try {
-                file.write("\nIP: " + key + " Status:\n\tOpen Ports Found:\n");
+
                 Queue<String> portReport = data.get(key);
+                file.write("\nIP: " + key + " Status:\n  " + portReport.size() + " Open Ports Found:\n");
                 for (String port : portReport){
-                    file.write("\t\t" + port + "\n");
+                    file.write("    " + port + "\n");
                 }
             } catch (IOException uhOh){
                 System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
