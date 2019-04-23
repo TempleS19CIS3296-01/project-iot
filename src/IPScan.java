@@ -32,8 +32,7 @@ public class IPScan implements Runnable{
                     synchronized (hits) {
                         hits.add(ipAddress);
                     }
-                } //else
-                    //System.out.println("PING FAILED: " + ipAddress);
+                }
             } catch (IOException e){
                 System.out.println("IOException");
                 e.printStackTrace();
