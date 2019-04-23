@@ -177,9 +177,6 @@ public class PortNameMap {
         map.put(6679, "IRC over SSL");
         map.put(6697, "IRC over SSL");
         map.put(6699, "Napster");
-        for (int i = 6881; i < 7000; i++){
-            map.put(i, "BitTorrent");
-        }
         for (int i = 6891; i < 6902; i++) {
             map.put(i, "Windows Live");
         }
