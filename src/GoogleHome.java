@@ -6,7 +6,6 @@ import java.io.IOException;
 public class GoogleHome {
     // This is where we store the current version of firmware for the google home.
     private String recentFirmWareVersion;
-    private boolean upToDate;
 
     public GoogleHome(){
          recentFirmWareVersion = getFirmWareVersion();
@@ -33,13 +32,13 @@ public class GoogleHome {
      * @param version: The current firmware version of the Google Home (this will be found by parsing the JSON from the Audit.
      *
      */
-    public void checkFirmware(String version){
+    public boolean checkFirmware(String version){
         if (version.equals(recentFirmWareVersion)){
             System.out.println("Your Google Home is up to date.");
-            upToDate = true;
+            return true;
         } else {
-            System.out.println("Your Google Home is out of date. You are on Firmware verison " + version + ", but you should be on version " + recentFirmWareVersion);
-            upToDate = false;
+            System.out.println("Your Google Home is out of date. You are on Firmware verison " + version + ", but you should be on version " + recentFirmWareVersion + "\nPlease consider updating your device.");
+            return false;
         }
     }
 

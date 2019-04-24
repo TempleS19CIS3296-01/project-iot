@@ -217,6 +217,7 @@ public class main {
 
     public static void outputLog(Clock clock){
         BufferedWriter file;
+        Integer upToDate = null;
         try {
             file = new BufferedWriter(new FileWriter("report.log"));
         } catch (IOException uhOh){
@@ -238,14 +239,28 @@ public class main {
             try {
 
                 Queue<String> portReport = data.get(key);
-                file.write("\nIP: " + key + " Status:\n  " + portReport.size() + " Open Ports Found:\n");
+                file.write("\nIP: " + key + " Status:\n  " + (portReport.size()/2) + " Open Ports Found:\n");
                 for (String port : portReport){
+                    if (port.startsWith("Up to date: ")){
+                        upToDate = Integer.parseInt(port.substring(port.indexOf(":") + 2));
+                        continue;
+                    }
                     file.write("    " + port + "\n");
                 }
             } catch (IOException uhOh){
                 System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
             }
-
+            if (upToDate != 0) {
+                try {
+                    if (upToDate > 0) {
+                        file.write("  Device is up to date.\n");
+                    } else {
+                        file.write("  Device is not up to date. Please consider updating your device.\n");
+                    }
+                } catch (IOException e) {
+                    System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
+                }
+            }
         }
 
         try {

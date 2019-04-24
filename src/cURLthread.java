@@ -14,6 +14,7 @@ import org.json.JSONObject;
 public class cURLthread implements Runnable {
     private int port;
     private String IP;
+    private int upToDate = 0;
 
     public cURLthread(int port, String IP){
         this.port = port;
@@ -40,11 +41,12 @@ public class cURLthread implements Runnable {
                 try {
                     String localFirmVersion = jsonParser(jsonConverter(socketURL), "cast_build_revision");
                     System.out.println("The most up to date firmware version to be on is " + g.getRecentFirmWareVersion() + " and you are on version " + localFirmVersion + ".");
-                    if (localFirmVersion.equals(g.getRecentFirmWareVersion())){
-                        System.out.println("Looks good to me!");
+                    if (g.checkFirmware(localFirmVersion)){
+                        upToDate = 1;
                     } else {
-                        System.out.println("Looks like it's time for an update.");
+                        upToDate = -1;
                     }
+
                 } catch (JSONException e){
                     e.printStackTrace();
                 }
@@ -91,5 +93,9 @@ public class cURLthread implements Runnable {
         } catch (UnknownHostException | SocketException expected){// This will happen.
         }
         return false;
+    }
+
+    public int getUpToDate(){
+        return upToDate;
     }
 }

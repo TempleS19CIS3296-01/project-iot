@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class WorkerScanner implements Runnable{
-    private HashMap<String, Queue> logger;
+    private HashMap<String, HashMap<Queue, Queue>> logger;
     private HashMap<String, LinkedListInt> portMap;
     private String IP;
     private HashMap namedPorts = new PortNameMap().getMap();
@@ -28,7 +28,7 @@ public class WorkerScanner implements Runnable{
                 socket.close();
 
                 addToPortMap(port);
-                log(port);
+
 
                 // TODO: We don't want worker threads printing... Or do we?
                 if (namedPorts.containsKey(port)){
@@ -36,8 +36,17 @@ public class WorkerScanner implements Runnable{
                 } else {
                     System.out.println("IP: " + IP + " Unnamed port found at : " + port);
                 }
+
+                cURLthread t = new cURLthread(port, IP);
+                Thread thread = new Thread(t, "cURLer");
+                thread.start();
+                Logger log = new Logger(logger, IP, thread, port, namedPorts, t);
+                Thread loggingThread = new Thread(log, "Logger");
+                loggingThread.start();
+                //log(port, thread);
             } catch (Exception expected) {// We expect we won't be able to hit many ports.
             }
+
         }
     }
     // TODO: Do we need synchronized? no other thread will have the same IP address.
@@ -54,8 +63,9 @@ public class WorkerScanner implements Runnable{
             portMap.put(IP, portList);
         }
     }
+    /*
     // TODO: Do we need this synchronized? I think the answer is also no. We should test this. It might improve performance.
-    synchronized void log(int port){
+    synchronized void log(int port, Thread thread){
         if (logger.get(IP) != null){
             // If we already have something logged for this IP, add to it.
             Queue<String> tmp = logger.get(IP);
@@ -75,4 +85,5 @@ public class WorkerScanner implements Runnable{
             logger.put(IP, tmp);
         }
     }
+    */
 }
