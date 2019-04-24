@@ -1,4 +1,5 @@
 
+
 import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class WorkerScanner implements Runnable{
 
     public void run(){
         // Iterate over all ports.
+        LinkedList<Thread> loggingThreadPool = new LinkedList<>();
         for(int port = 0; port < 65535; port++){
             try {
                 // Try to establish a socket connection with IP and port.
@@ -28,7 +30,7 @@ public class WorkerScanner implements Runnable{
                 socket.close();
 
                 addToPortMap(port);
-                log(port);
+
 
                 // TODO: We don't want worker threads printing... Or do we?
                 if (namedPorts.containsKey(port)){
@@ -36,7 +38,22 @@ public class WorkerScanner implements Runnable{
                 } else {
                     System.out.println("IP: " + IP + " Unnamed port found at : " + port);
                 }
+
+                cURLthread t = new cURLthread(port, IP);
+                Thread thread = new Thread(t, "cURLer");
+                thread.start();
+                Logger log = new Logger(logger, IP, thread, port, namedPorts, t);
+                Thread loggingThread = new Thread(log, "Logger");
+                loggingThreadPool.add(loggingThread);
+                loggingThread.start();
+                //log(port, thread);
             } catch (Exception expected) {// We expect we won't be able to hit many ports.
+            }
+        }
+        for (int i = 0; i < loggingThreadPool.size(); i++){
+            try {
+                loggingThreadPool.get(i).join();
+            } catch (InterruptedException e){
             }
         }
     }
@@ -52,27 +69,6 @@ public class WorkerScanner implements Runnable{
             portList = new LinkedListInt();
             portList.add(port);
             portMap.put(IP, portList);
-        }
-    }
-    // TODO: Do we need this synchronized? I think the answer is also no. We should test this. It might improve performance.
-    synchronized void log(int port){
-        if (logger.get(IP) != null){
-            // If we already have something logged for this IP, add to it.
-            Queue<String> tmp = logger.get(IP);
-            if (namedPorts.containsKey(port)) {
-                tmp.add(port + ": " + namedPorts.get(port) + ".");
-            } else {
-                tmp.add(port + ": Unnamed port.");
-            }
-            logger.put(IP, tmp);
-        } else {
-            Queue<String> tmp = new LinkedList<>();
-            if (namedPorts.containsKey(port)) {
-                tmp.add(port + ": " + namedPorts.get(port) + ".");
-            } else {
-                tmp.add(port + ": Unnamed port.");
-            }
-            logger.put(IP, tmp);
         }
     }
 }
