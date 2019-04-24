@@ -299,7 +299,7 @@ public class main {
         }
         choice = scan.nextInt();
       } while(choice != 1 && choice != 2);
-      
+      scan.nextLine();
       return choice;
     }
 
@@ -321,7 +321,6 @@ public class main {
         System.out.println("Enter your desired IP subnet to scan: [ex. 192.168.1]");
         sub = scan.nextLine();
       } while(!ipv4Pattern.matcher(sub).matches());
-      
       return sub;
     }
 
@@ -341,7 +340,7 @@ public class main {
         }
         maxRange = scan.nextInt();
       } while(maxRange <= 0 || maxRange >= 256);
-      
+
       return maxRange;
     }
 }
