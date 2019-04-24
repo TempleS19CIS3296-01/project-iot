@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class WorkerScanner implements Runnable{
-    private HashMap<String, HashMap<Queue, Queue>> logger;
+    private HashMap<String, Queue> logger;
     private HashMap<String, LinkedListInt> portMap;
     private String IP;
     private HashMap namedPorts = new PortNameMap().getMap();
@@ -71,27 +71,4 @@ public class WorkerScanner implements Runnable{
             portMap.put(IP, portList);
         }
     }
-    /*
-    // TODO: Do we need this synchronized? I think the answer is also no. We should test this. It might improve performance.
-    synchronized void log(int port, Thread thread){
-        if (logger.get(IP) != null){
-            // If we already have something logged for this IP, add to it.
-            Queue<String> tmp = logger.get(IP);
-            if (namedPorts.containsKey(port)) {
-                tmp.add(port + ": " + namedPorts.get(port) + ".");
-            } else {
-                tmp.add(port + ": Unnamed port.");
-            }
-            logger.put(IP, tmp);
-        } else {
-            Queue<String> tmp = new LinkedList<>();
-            if (namedPorts.containsKey(port)) {
-                tmp.add(port + ": " + namedPorts.get(port) + ".");
-            } else {
-                tmp.add(port + ": Unnamed port.");
-            }
-            logger.put(IP, tmp);
-        }
-    }
-    */
 }
