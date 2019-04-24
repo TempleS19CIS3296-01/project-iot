@@ -1,4 +1,5 @@
 
+
 import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class WorkerScanner implements Runnable{
 
     public void run(){
         // Iterate over all ports.
+        LinkedList<Thread> loggingThreadPool = new LinkedList<>();
         for(int port = 0; port < 65535; port++){
             try {
                 // Try to establish a socket connection with IP and port.
@@ -42,11 +44,17 @@ public class WorkerScanner implements Runnable{
                 thread.start();
                 Logger log = new Logger(logger, IP, thread, port, namedPorts, t);
                 Thread loggingThread = new Thread(log, "Logger");
+                loggingThreadPool.add(loggingThread);
                 loggingThread.start();
                 //log(port, thread);
             } catch (Exception expected) {// We expect we won't be able to hit many ports.
             }
-
+        }
+        for (int i = 0; i < loggingThreadPool.size(); i++){
+            try {
+                loggingThreadPool.get(i).join();
+            } catch (InterruptedException e){
+            }
         }
     }
     // TODO: Do we need synchronized? no other thread will have the same IP address.
