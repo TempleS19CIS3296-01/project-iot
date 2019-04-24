@@ -250,11 +250,12 @@ public class main {
             } catch (IOException uhOh){
                 System.out.println("I'm just hoping you ctr-F for Patrick and find all these messages heheheh.");
             }
-            if (upToDate != 0) {
+            if (upToDate != null) {
                 try {
+                    // In the case that upToDate IS 0, we'll ignore it.
                     if (upToDate > 0) {
                         file.write("  Device is up to date.\n");
-                    } else {
+                    } else if (upToDate < 0) {
                         file.write("  Device is not up to date. Please consider updating your device.\n");
                     }
                 } catch (IOException e) {
